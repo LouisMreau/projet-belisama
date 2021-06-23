@@ -28,8 +28,8 @@ const NavMain = (props) => {
     <Nav className="mr-auto">
     <div style={{marginRight: "20px"}}></div>
     
-      <Link className="nav-cat" to="/">
-        <a>Données</a>
+      <Link className="nav-cat" to="/map">
+        <a>Carte</a>
       </Link>
       <div style={{marginRight: "20px"}}></div>
       <Link className="nav-cat" to="/contact">

@@ -1,0 +1,21 @@
+
+.spectrum-container{
+    margin: 50px auto;
+    align-items: center;
+    width: 60%;
+}
+
+.count-container{
+    margin: 50px auto;
+    align-items: center;
+    width: 60%;
+    margin-bottom: 50px;
+}
+
+.periode-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 20px;
+
+}

@@ -16,11 +16,11 @@ const Contact = (props) => {
         philippe.laurent@cea.fr <br/> 
         <br/> 
         
-        <p style={{fontWeight: "bold"}}>Hugo Marchand - Développeur, Data Scientist</p>
+        <p style={{fontWeight: "bold"}}>Hugo Marchand - Data Scientist</p>
         hugo.marchand@yahoo.com <br/> 
         <br/> 
         
-        <p style={{fontWeight: "bold"}}>Louis Moreau - Développeur, Data Scientist</p>
+        <p style={{fontWeight: "bold"}}>Louis Moreau - Architecte Cloud et Web, Développeur, Data Scientist </p>
         moreaulouis.ml@gmail.com <br/> 
         <br/> 
             
