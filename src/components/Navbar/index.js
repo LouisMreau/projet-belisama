@@ -17,11 +17,12 @@ const NavMain = (props) => {
     <Navbar className="black" variant="dark">
       
     <NavLink to="/">
-    <img
+    <img className = 'logo'
         src={Logo}
-        width="150"
-        height="36"
-        className="d-inline-block align-top"
+        // width="150"
+        // height="36"
+        // height = "50%"
+        // className="d-inline-block align-top"
         alt="React Bootstrap logo"
       />
     </NavLink>

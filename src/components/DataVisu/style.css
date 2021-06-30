@@ -3,6 +3,8 @@
     margin: 50px auto;
     align-items: center;
     width: 60%;
+    margin-bottom: 50px;
+    padding: 1em;
 }
 
 .count-container{
@@ -10,12 +12,38 @@
     align-items: center;
     width: 60%;
     margin-bottom: 50px;
+    padding: 1em;
 }
 
 .periode-container{
     display: flex;
     flex-direction: row;
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 50px;
+
+
 
 }
+
+.download-container{
+    margin: auto auto;
+    align-items: center;
+    width: 60%;
+    margin-bottom: 50px;
+    padding: 1em;
+}
+
+.download_button{
+    display: flex;
+    justify-content: center;
+    margin-bottom : 100px ;
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.download_data {
+    padding: 1em;
+    margin: 1em;
+}
+
