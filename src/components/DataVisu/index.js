@@ -5,20 +5,22 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,Responsiv
 import moment from 'moment'
 // import dataLean from '../../resources/data/data_lean.json'
 import Slider from '@material-ui/core/Slider';
-import { getDefaultNormalizer } from '@testing-library/dom';
+
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
 
 import {Grid, Container, Button, Paper, Box, Typography} from '@material-ui/core';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import PropTypes from 'prop-types';
 import csvjson from 'csvjson'
 
-import JSZip from 'jszip';
-import JSZipUtils from 'jszip-utils'
-import FileSaver from 'file-saver';
 
 import Download from '../Download/index';
-
+import Count from '../Count/count';
+import Energy from '../Energy/energy';
 
 /**
 * @author
@@ -37,7 +39,6 @@ const DataVisu = (props) => {
   const [dataLean, setDataLean] = useState([]);
   const [isLoadinData, setIsLoadingData] = useState(true); 
   const [loadingMessage, setloadingMessage] = useState("Chargement des données du détecteur..."); 
-
 
   useEffect(() => {
     if (dataLean.length > 0) { setCountSerie(dataLean) }
@@ -59,9 +60,6 @@ const DataVisu = (props) => {
     }
   },[dataLean])
 
-
-
-
   const loadData = async () => {
     await axios.get('https://data-belisama.s3.eu-west-3.amazonaws.com/'+detectorId+'/data_lean.json')
         .then(response => {
@@ -74,7 +72,6 @@ const DataVisu = (props) => {
           setloadingMessage("Détecteur introuvable")
         })
   }
-
 
   const handleCountSliderChange = (event, newValue) => {
     setCountSliderValue(newValue);
@@ -90,10 +87,9 @@ const DataVisu = (props) => {
     else { setSpectrumTimeValue([newValue,spectrumTimeValue[1]]); }
   };
 
-
   const createChartData = (xx,yy) => {
     let chartData = []
-    for (var i = 0; i<xx.length; i++) {
+    for (var i = 0; i<yy.length; i++) {
       chartData.push({x:xx[i],y:yy[i]})
     }
     return chartData
@@ -105,7 +101,10 @@ const DataVisu = (props) => {
     for (var i = inf_time; i<sup_time;i++) {
       counts.push(dataLean[1][i].slice(inf_energy,sup_energy).reduce((a, b) => a + b, 0))
       times.push(i)
+      // times.push(moment(countTimeValue[0]).add(i, 'hour').format("DD-MM-yyyy"))
+      
     }
+    // console.log(times)
     return [times,counts]
   }
 
@@ -154,35 +153,11 @@ const DataVisu = (props) => {
     return diff_time / (1000 * 3600);
   }
 
- 
-
-  const downloadAsJsonFile = (data, filename) => {
-    // -------------- Transform data into json and download file ------------------
-    const contentType = 'application/octet-stream';
-    if(!data) {
-        console.error(' No data')
-        return;
-    }
-    if(!filename) filename = 'filetodownload.txt'
-    if(typeof data === "object"){
-        data = JSON.stringify(data, undefined, 4)
-    }
-    var blob = new Blob([data], {type: contentType}),
-        e    = document.createEvent('MouseEvents'),
-        a    = document.createElement('a')
-
-    a.download = filename
-    a.href = window.URL.createObjectURL(blob)
-    a.dataset.downloadurl =  [contentType, a.download, a.href].join(':')
-    e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
-    a.dispatchEvent(e)
-  }
-
 
 
   const download_CSV = (data, filename) => {
     // -----------Transform data into json then CSV and download it --------------------
-    // console.log(data)
+    data.map((item) => {item.x = moment(spectrumTimeValue[0]).add(item.x, 'hour').format("DD/MM/yyyy")})
     data = JSON.stringify(data, undefined, 4);
     const csvData = csvjson.toCSV(data, {
       headers: 'key'
@@ -210,41 +185,105 @@ const DataVisu = (props) => {
     a.dispatchEvent(e)
   }
 
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  function TabPanel(props) {
+    const { children, value, index, ...other } = props;
   
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`full-width-tabpanel-${index}`}
+        aria-labelledby={`full-width-tab-${index}`}
+        {...other}
+      
+      >
+        {value === index && (
+          <Box p={3}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+  
+  TabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired,
+  };
+  
+  function a11yProps(index) {
+    return {
+      id: `full-width-tab-${index}`,
+      'aria-controls': `full-width-tabpanel-${index}`,
+      
+    };
+  }
+
+
+  const [value, setValue] = useState(0);
+ 
 
   return(
-    <Container maxWidth="xl">
-    <Grid container spacing={3}>
-    <Grid item xs={12}>
-    <div className="data-container">
+
+    <div>
+   
+
         { isLoadinData && 
           <h2 style={{margin:"30px"}}>{loadingMessage}</h2>}
         { !isLoadinData && 
-    <Grid container spacing={3}>
-    <Grid item xs={12}>
-
-    
+    <div>
+    <AppBar position="static">
+      <Paper square>
+        <Tabs value={value} onChange={handleChange} indicatorColor = "primary"
+    variant="fullWidth"
+    aria-label="full width tabs example"
+    textColor="primary"
+    centered>
+          <Tab label="Taux de comptage" {...a11yProps(0)} />
+          <Tab label="Spectre en énergie" {...a11yProps(1)} />
+          <Tab label="Téléchargement" className = 'word' {...a11yProps(2)} />
+        </Tabs>
+        </Paper>
+      </AppBar>
+      <TabPanel value={value} index={0}>
+      
       <Grid container spacing={3}>
       <Grid item xs={12}>
-      <Paper>
-        <div className="count-container">
-
-          <h4 classname = 'title' style={{marginTop : "20px", marginBottom: "20px"}}>Taux de comptage temporel</h4>
-
-          <h6 style={{marginBottom:"20px"}}>Période</h6>
-            <div className="periode-container">
+      {/* <Paper> */}
+        <Grid container className="count-container">
+          <Grid item xs={12}>
+            <h4 classname = 'title' style={{marginTop : "20px", marginBottom: "20px"}}>Taux de comptage temporel</h4>
+          </Grid>
+          
+          <Grid container justify = 'center' spacing = {3} className="periode-container">
+            <Grid item xs = {10}>
+              <Grid container>
+            <Grid item xs={12}>
+              <h6 style={{marginBottom:"15px", marginTop:"50px"}}>Période</h6>
+            </Grid>
             <Grid item xs={12} sm = {6}>
-              <p style={{marginRight:"20px", marginLeft:"20px"}}>Début</p>
+              <p style={{marginRight:"20px", marginLeft:"20px", marginTop : '20px'}}>Début</p>
               <DatePicker minDate={new Date(dataLean[0][0])} maxDate={new Date(countTimeValue[1].getTime())} dateFormat="dd/MM/yyyy" selected={countTimeValue[0]} onChange={date => handleCountTimeChange(false,date)} />
             </Grid>
             <Grid item xs={12} sm = {6}> 
-              <p style={{marginLeft:"20px",marginRight:"20px"}}>Fin</p>
+              <p style={{marginLeft:"20px",marginRight:"20px", marginTop : '20px'}}>Fin</p>
               <DatePicker minDate={new Date(countTimeValue[0].getTime())} maxDate={new Date(dataLean[0][1])} dateFormat="dd/MM/yyyy" selected={countTimeValue[1]} onChange={date => handleCountTimeChange(true,date)} />
             </Grid>
-          
-            </div>  
-  
-            <h6 style={{marginBottom:"20px"}}>Gamme d'énergie</h6>
+            </Grid>
+            </Grid>
+          </Grid> 
+
+          <Grid container justify = 'center' alignItems = 'center' >
+          <Grid item xs={12}>
+            <h6 style={{marginBottom:"20px", marginTop:"50px"}}>Gamme d'énergie</h6>
+          </Grid>
+         
+          <Grid item xs={9} >
             <Slider
             min={dataLean[0][2]}
             max={dataLean[0][2]+dataLean[0][3]*dataLean[0][4]}
@@ -255,11 +294,13 @@ const DataVisu = (props) => {
             aria-labelledby="range-slider"
             marks={[{value:dataLean[0][2],label:dataLean[0][2].toString()+" keV"},{value:dataLean[0][2]+dataLean[0][3]*dataLean[0][4],label:(dataLean[0][2]+dataLean[0][3]*dataLean[0][4]).toString()+" keV"}]}
             />
+          
+          </Grid>
 
-            
+          <Grid  xs={12} sm = {9}>
           {/* Count Serie */}
 
-          <ResponsiveContainer width='100%' height={400}>
+          <ResponsiveContainer width='100%' height={400} >
                   
               <LineChart
               width={50}
@@ -279,30 +320,40 @@ const DataVisu = (props) => {
               name = 'Time'
               type = 'number'
               tickFormatter = {(hours) => moment(countTimeValue[0]).add(hours, 'hour').format("DD/MM/yyyy")}
-              label={{ value: 'Date', position: 'insideBottomRight', offset: 0, margin : "50px"}} />
+              label={{ value: 'Date', position: 'insideBottomRight', offset: -20}} />
               <YAxis  domain={[0, 'maxData']}/>
-              <Legend/>
+              <Legend verticalAlign = 'bottom' />
               <Line name="Coups/s" type="monotone" dataKey="y" stroke="#82ca9d" dot={false} />
               </LineChart>
           </ResponsiveContainer>
+          
           <Button classname = 'download_button' onClick={() => download_CSV(countData, "count_data.csv")}>Téléchargement des données</Button>
-        </div>
-        </Paper>
+          </Grid>  
+          </Grid>
+        </Grid>
+        
+        {/* </Paper> */}
         </Grid>
       </Grid>
-      
 
-        {/* Energy Spectrum */}
-      
+      </TabPanel>
+      <TabPanel value={value} index={1}>
         <Grid container spacing={3}>
         <Grid item xs={12}>
-        <Paper>
-          <div className="spectrum-container">
-              <h4 classname = 'title' style={{marginBottom:"20px"}}>Spectre en énergie</h4>
-              <h6 style={{marginBottom:"20px"}}>Période</h6>
-                <div className="periode-container">
+        {/* <Paper> */}
+          <Grid container className="spectrum-container">
+            <Grid item xs={12}>
+              <h4 classname = 'title' style={{marginTop:"20px", marginBottom : "20px"}}>Spectre en énergie</h4>
+            </Grid>  
+            <Grid container justify = 'center' spacing = {3} className="periode-container">
+             <Grid item xs = {10}>
+              <Grid container>
+                <Grid item xs={12}>
+                  <h6 style={{marginBottom:"15px",marginTop:"50px"}}>Période</h6>
+                </Grid>
+
                   <Grid item xs={12} sm = {6}>
-                    <p style={{marginRight:"20px", marginLeft:"20px"}}>Début</p>
+                    <p style={{marginRight:"20px", marginLeft:"20px", marginTop : "20px"}}>Début</p>
                       <DatePicker 
                         minDate={new Date(dataLean[0][0])} 
                         maxDate={new Date(spectrumTimeValue[1].getTime())} 
@@ -316,7 +367,7 @@ const DataVisu = (props) => {
                           } else handleSpectrumTimeChange(false,date)}} />
                   </Grid>
                   <Grid item xs={12} sm = {6}>
-                    <p style={{marginLeft:"20px",marginRight:"20px"}}>Fin</p>
+                    <p style={{marginLeft:"20px",marginRight:"20px", marginTop : "20px"}}>Fin</p>
                     <DatePicker 
                       minDate={new Date(spectrumTimeValue[0].getTime())} 
                       maxDate={new Date(dataLean[0][1])}               
@@ -329,8 +380,13 @@ const DataVisu = (props) => {
                         alert("Erreur : Merci de bien sélectionner une date entre " + new Date(dataLean[0][0]).toString() + 'et '+ new Date(dataLean[0][1]).toString()  );
                       } else handleSpectrumTimeChange(true,date)}} />
                   </Grid>
-                </div>
-
+            </Grid>
+            </Grid>
+          </Grid> 
+          <Grid container justify = 'center' alignItems = 'center' >
+          <Grid  xs={12} sm = {9}>
+          <Box margin = '5em' color = 'white'>
+          </Box>
           <ResponsiveContainer width='100%' height={400}>
                   
               <LineChart
@@ -350,30 +406,32 @@ const DataVisu = (props) => {
               domain = {['0', 'maxData']}
               name = 'Time'
               type = 'number'
-              label={{ value: 'Energie (keV)', position: 'insideBottomRight', offset: 0}} />
+              label={{ value: 'Energie (keV)', position: 'insideBottomRight', offset : -6}} />
               <YAxis  domain={[0, 'maxData']}/>
-              <Legend />
+              <Legend verticalAlign="bottom" align = 'left'/>
               <Line name="Densité d'énergie" type="monotone" dataKey="y" stroke="#82ca9d" dot={false} />
           </LineChart>
           </ ResponsiveContainer>
-          <Button classname = 'download_button' onClick={() => download_CSV(spectrumData, "spectrum_data.json")}>Téléchargement des données</Button>
-          </div>
-          </Paper>
+          
+          <Button marginTop = "20px" classname = 'download_button' onClick={() => download_CSV(spectrumData, "spectrum_data.json")}>Téléchargement des données</Button>
           </Grid>
-        </Grid>
-        
-    
+          </Grid>
+          </Grid>
+          {/* </Paper> */}
+          </Grid>
+        </Grid> 
+      </TabPanel>
+      <TabPanel value={value} index={2}>
         <Download dataLean={dataLean} detectorId = {detectorId}/>
+      </TabPanel>
+    
 
-      </Grid>
-    </Grid> }
+    </div> }
         
 
-       
-    </div> 
-    </Grid>
-    </Grid>
-    </Container>
+
+    </div>
+
    )
 
  }

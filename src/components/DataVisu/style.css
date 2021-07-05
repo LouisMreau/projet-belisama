@@ -47,3 +47,6 @@
     margin: 1em;
 }
 
+.word{
+    word-break: break-all;
+}
