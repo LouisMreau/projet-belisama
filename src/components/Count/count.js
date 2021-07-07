@@ -3,7 +3,6 @@ import './style.css'
 import {Link, useParams} from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,ResponsiveContainer, Label } from 'recharts';
 import moment from 'moment'
-// import dataLean from '../../resources/data/data_lean.json'
 import Slider from '@material-ui/core/Slider';
 import { getDefaultNormalizer } from '@testing-library/dom';
 import DatePicker from "react-datepicker";
@@ -29,9 +28,7 @@ import Download from '../Download/index';
 
 const Count = (props) => {
   const detectorId  = props.detectorId;
-  // const [dataLean, setDataLean] = useState([]);
   var dataLean = props.dataLean
-  console.log(dataLean)
   const [countSliderValue, setCountSliderValue] = useState([dataLean[0][2], dataLean[0][2]+500]);
   const [countTimeValue, setCountTimeValue] = useState([new Date(dataLean[0][0]),new Date(dataLean[0][1])]);
   const [countData, setCountData] = useState([]);
@@ -80,7 +77,7 @@ const Count = (props) => {
   const loadCountSerie = (dataLean, inf_energy,sup_energy, inf_time, sup_time) => {
     let counts = []
     let times = []
-    for (var i = inf_time; i<=sup_time;i++) {
+    for (var i = inf_time; i<sup_time;i++) {
       counts.push(dataLean[1][i].slice(inf_energy,sup_energy).reduce((a, b) => a + b, 0))
       times.push(i)
       // times.push(moment(countTimeValue[0]).add(i, 'hour').format("DD-MM-yyyy"))
@@ -95,8 +92,6 @@ const Count = (props) => {
     let end_energy = Math.trunc((countSliderValue[1]-dataLean[0][2])/dataLean[0][3])
     let start_time = (countTimeValue[0].getTime()-dataLean[0][0])/1000/3600
     let end_time = (countTimeValue[1].getTime()+24*3600*1000-dataLean[0][0])/1000/3600
-    console.log(start_time)
-    console.log(end_time)
     let data = loadCountSerie(dataLean,start_energy, end_energy,start_time,end_time)
     data = createChartData(data[0],data[1])
     setCountData(data)

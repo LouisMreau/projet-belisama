@@ -131,7 +131,6 @@ const Energy = (props) => {
 
   const download_CSV = (data, filename) => {
     // -----------Transform data into json then CSV and download it --------------------
-    data.map((item) => {item.x = moment(spectrumTimeValue[0]).add(item.x, 'hour').format("DD/MM/yyyy")})
     data = JSON.stringify(data, undefined, 4);
     const csvData = csvjson.toCSV(data, {
       headers: 'key'
@@ -232,7 +231,7 @@ const Energy = (props) => {
           dataKey = 'x'
           name = 'Energy'
           type = 'number'
-          domain ={[dataMin => 0, dataMax => (dataMax /2)]}
+          domain ={[dataMin => dataMin, dataMax => (dataMax)]}
           label={{ value: 'Energie (keV)', position: 'insideBottomRight', offset : -2}} />
           <YAxis  domain={[0, 'maxData']}/>
           <Legend wrapperStyle={{position: 'relative'}} />
@@ -241,7 +240,7 @@ const Energy = (props) => {
       </ ResponsiveContainer>
       <Box margin = '5em' color = 'white'>
       </Box>
-      <Button marginTop = "20px" classname = 'download_button' onClick={() => download_CSV(spectrumData, "spectrum_data.json")}>Téléchargement des données</Button>
+      <Button marginTop = "20px" classname = 'download_button' onClick={() => download_CSV(spectrumData, "spectrum_data.csv")}>Téléchargement des données</Button>
       </Grid>
       </Grid>
       </Grid>

@@ -3,8 +3,8 @@ import './style.css'
 import {Link, useParams} from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,ResponsiveContainer } from 'recharts';
 import moment from 'moment'
-import dataLean2 from '../../resources/data/data_lean.json'
-import dataLean3 from '../../resources/data/data_lean20210605.json'
+// import dataLean2 from '../../resources/data/data_lean.json'
+// import dataLean3 from '../../resources/data/data_lean20210605.json'
 import Slider from '@material-ui/core/Slider';
 
 import DatePicker from "react-datepicker";
