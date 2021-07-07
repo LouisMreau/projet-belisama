@@ -1,6 +1,6 @@
-import React , {useState, useCallback, useMemo} from 'react';
+import React , {useState, useCallback, useMemo,  useEventHandlers} from 'react';
 import './style.css'
-import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvent } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvent, Rectangle } from "react-leaflet";
 import {Button} from 'react-bootstrap'
 import {NavLink, Link} from "react-router-dom";
 import dataDetector from '../../resources/data/data_detector.json';

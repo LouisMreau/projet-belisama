@@ -30,8 +30,7 @@ import Download from '../Download/index';
 const Energy = (props) => {
     const detectorId  = props.detectorId;
     const dataLean = props.dataLean;
-    const [countTimeValue, setCountTimeValue] = useState([]);
-    const [spectrumTimeValue, setSpectrumTimeValue] = useState([]);
+    const [spectrumTimeValue, setSpectrumTimeValue] = useState([new Date(dataLean[0][0]),new Date(dataLean[0][1])]);
     const [spectrumData, setSpectrumData] = useState([]);
 
 
@@ -49,7 +48,8 @@ const Energy = (props) => {
   },[dataLean])
 
 
-
+  const start_date_limit = moment([new Date(dataLean[0][0]).getFullYear(), new Date(dataLean[0][0]).getMonth(), new Date(dataLean[0][0]).getDate()])
+  const end_date_limit = moment([new Date(dataLean[0][1]).getFullYear(), new Date(dataLean[0][1]).getMonth(), new Date(dataLean[0][1]).getDate()])
 
 
   const handleSpectrumTimeChange = (isEndTime, newValue) => {
@@ -165,73 +165,89 @@ const Energy = (props) => {
 
 
 
-        <Grid container spacing={3}>
+    <Grid container spacing={3}>
+    <Grid item xs={12}>
+    {/* <Paper> */}
+      <Grid container className="spectrum-container">
         <Grid item xs={12}>
-        <Paper>
-          <div className="spectrum-container">
-              <h4 classname = 'title' style={{marginTop:"20px", marginBottom : "20px"}}>Spectre en énergie</h4>
-              <h6 style={{marginBottom:"20px"}}>Période</h6>
-                <div className="periode-container">
-                  <Grid item xs={12} sm = {6}>
-                    <p style={{marginRight:"20px", marginLeft:"20px"}}>Début</p>
-                      <DatePicker 
-                        minDate={new Date(dataLean[0][0])} 
-                        maxDate={new Date(spectrumTimeValue[1].getTime())} 
-                        timeInputLabel="Heure :"
-                        dateFormat="dd/MM/yyyy h:mm"
-                        showTimeInput 
-                        selected={spectrumTimeValue[0]} 
-                        onChange={date => {
-                          if ((date > dataLean[0][1]) ||(date < dataLean[0][0]) ) {
-                            alert("Erreur : Merci de bien sélectionner une date entre " + new Date(dataLean[0][0]).toString() + 'et '+ new Date(dataLean[0][1]).toString()  );
-                          } else handleSpectrumTimeChange(false,date)}} />
-                  </Grid>
-                  <Grid item xs={12} sm = {6}>
-                    <p style={{marginLeft:"20px",marginRight:"20px"}}>Fin</p>
-                    <DatePicker 
-                      minDate={new Date(spectrumTimeValue[0].getTime())} 
-                      maxDate={new Date(dataLean[0][1])}               
-                      timeInputLabel="Heure :"
-                      dateFormat="dd/MM/yyyy h:mm"
-                      // showTimeInput  
-                      selected={spectrumTimeValue[1]} 
-                      onChange={date => { 
-                        if ((date > dataLean[0][1]) ||(date < dataLean[0][0]) ) {
-                        alert("Erreur : Merci de bien sélectionner une date entre " + new Date(dataLean[0][0]).toString() + 'et '+ new Date(dataLean[0][1]).toString()  );
-                      } else handleSpectrumTimeChange(true,date)}} />
-                  </Grid>
-                </div>
+          <h4 classname = 'title' style={{marginTop:"20px", marginBottom : "20px"}}>Spectre en énergie</h4>
+        </Grid>  
+        <Grid container justify = 'center' spacing = {3} className="periode-container">
+         <Grid item xs = {10}>
+          <Grid container>
+            <Grid item xs={12}>
+              <h6 style={{marginBottom:"15px",marginTop:"50px"}}>Période</h6>
+            </Grid>
 
-          <ResponsiveContainer width='100%' height={400}>
-                  
-              <LineChart
-              width={50}
-              height={300}
-              data={spectrumData}
-              margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-              }}
-          >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-              dataKey = 'x'
-              domain = {['0', 'maxData']}
-              name = 'Time'
-              type = 'number'
-              label={{ value: 'Energie (keV)', position: 'insideBottomRight', offset: 0}} />
-              <YAxis  domain={[0, 'maxData']}/>
-              <Legend />
-              <Line name="Densité d'énergie" type="monotone" dataKey="y" stroke="#82ca9d" dot={false} />
-          </LineChart>
-          </ ResponsiveContainer>
-          <Button classname = 'download_button' onClick={() => download_CSV(spectrumData, "spectrum_data.json")}>Téléchargement des données</Button>
-          </div>
-          </Paper>
-          </Grid>
+              <Grid item xs={12} sm = {6}>
+                <p style={{marginRight:"20px", marginLeft:"20px", marginTop : "20px"}}>Début</p>
+                  <DatePicker 
+                    minDate={new Date(dataLean[0][0])} 
+                    maxDate={new Date(spectrumTimeValue[1].getTime())} 
+                    timeInputLabel="Heure :"
+                    dateFormat="dd/MM/yyyy HH:mm"
+                    showTimeInput 
+                    selected={spectrumTimeValue[0]} 
+                    onChange={date => {
+                      if ((date > dataLean[0][1]) ||(date < dataLean[0][0]) ) {
+                        alert("Erreur : Merci de bien sélectionner une date entre " + start_date_limit.format("DD/MM/YYYY hh:mm:ss") + ' et '+ end_date_limit.format("DD/MM/YYYY hh:mm:ss")  );
+                      } else handleSpectrumTimeChange(false,date)}} />
+              </Grid>
+              <Grid item xs={12} sm = {6}>
+                <p style={{marginLeft:"20px",marginRight:"20px", marginTop : "20px"}}>Fin</p>
+                <DatePicker 
+                  minDate={new Date(spectrumTimeValue[0].getTime())} 
+                  maxDate={new Date(dataLean[0][1])}               
+                  timeInputLabel="Heure :"
+                  dateFormat="dd/MM/yyyy HH:mm"
+                  showTimeInput  
+                  selected={spectrumTimeValue[1]} 
+                  onChange={date => { 
+                    if ((date > dataLean[0][1]) ||(date < dataLean[0][0]) ) {
+                    alert("Erreur : Merci de bien sélectionner une date entre " + start_date_limit.format("DD/MM/YYYY hh:mm:ss") + ' et '+ end_date_limit.format("DD/MM/YYYY hh:mm:ss")  );
+                  } else handleSpectrumTimeChange(true,date)}} />
+              </Grid>
         </Grid>
+        </Grid>
+      </Grid> 
+      <Grid container justify = 'center' alignItems = 'center' >
+      <Grid  xs={12} sm = {9}>
+      <Box margin = '5em' color = 'white'>
+      </Box>
+      <ResponsiveContainer width='100%' height={400}>
+              
+          <LineChart
+          width={50}
+          height={300}
+          data={spectrumData}
+          margin={{
+          top: 5,
+          right: 30,
+          left: 20,
+          bottom: 5,
+          }}
+      >
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis 
+          dataKey = 'x'
+          name = 'Energy'
+          type = 'number'
+          domain ={[dataMin => 0, dataMax => (dataMax /2)]}
+          label={{ value: 'Energie (keV)', position: 'insideBottomRight', offset : -2}} />
+          <YAxis  domain={[0, 'maxData']}/>
+          <Legend wrapperStyle={{position: 'relative'}} />
+          <Line name="Densité d'énergie" type="monotone" dataKey="y" stroke="#82ca9d" dot={false} />
+      </LineChart>
+      </ ResponsiveContainer>
+      <Box margin = '5em' color = 'white'>
+      </Box>
+      <Button marginTop = "20px" classname = 'download_button' onClick={() => download_CSV(spectrumData, "spectrum_data.json")}>Téléchargement des données</Button>
+      </Grid>
+      </Grid>
+      </Grid>
+      {/* </Paper> */}
+      </Grid>
+    </Grid> 
    
 
    )

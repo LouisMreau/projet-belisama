@@ -35,6 +35,7 @@ const Download = (props) => {
   const MonthListRef = useRef(false);
   const today = new Date()
   const yesterday = new Date().setDate(today.getDate() - 1)
+  const firstDayofMonth = new Date().setDate(1)
   const oneMonthAgo = (date) => {
     const previousMonth = new Date();
     previousMonth.setMonth(date.getMonth() - 1);
@@ -272,7 +273,7 @@ const Download = (props) => {
                     <Paper square>
                       <Grid item justify = 'center'  className = 'download_data'>
                         <Grid>
-                        <h6 style={{marginTop: "20px", marginBottom: "20px"}}>Données traitées</h6>
+                        <h6 className = 'title' style={{marginTop: "20px", marginBottom: "20px"}}>Données traitées</h6>
                         </Grid>
                         <Grid>
                         <Button classname = 'download_button' onClick={() => downloadAsJsonFile(props.dataLean, "dataLean.json")}>Téléchargement des données traitées</Button>
@@ -287,13 +288,13 @@ const Download = (props) => {
                   <Grid item justify = 'center'  className = 'download_data'>
 
                     <Grid>
-                    <h6 style={{margin: "20px"}}>Données brutes par jour </h6>
+                    <h6  className = 'title' style={{margin: "20px"}}>Données brutes par jour </h6>
                     </Grid>
 
                     <Grid container direction="row" justify="center" className="periode-container">
                       <Grid item xs={12} sm = {6}>
                         <p style={{marginRight:"20px", marginLeft:"20px", marginTop : '15px', marginBottom : '15px'}}>Début</p>
-                        <DatePicker minDate={new Date("07-01-2021")} maxDate={new Date(downloadRawTimeValue[1]).getTime()} dateFormat="dd/MM/yyyy" selected={downloadRawTimeValue[0]} onChange={date => handleDownloadRawTimeChange(false,date)} />
+                        <DatePicker minDate={firstDayofMonth} maxDate={new Date(downloadRawTimeValue[1]).getTime()} dateFormat="dd/MM/yyyy" selected={downloadRawTimeValue[0]} onChange={date => handleDownloadRawTimeChange(false,date)} />
                       </Grid>
                       <Grid item xs={12} sm = {6}> 
                         <p style={{marginLeft:"20px",marginRight:"20px", marginTop : '15px', marginBottom : '15px'}}>Fin</p>
@@ -320,7 +321,7 @@ const Download = (props) => {
                 <Paper square>
                   <Grid item justify = 'center'  className = 'download_data'>   
                     <Grid>
-                      <h6 style={{margin: "20px"}}>Données brutes par mois </h6>
+                      <h6 className = 'title' style={{margin: "20px"}}>Données brutes par mois </h6>
                     </Grid> 
                     <Grid container direction="row" justify="center" className="periode-container">
                       <Grid item xs={12} sm = {6}>
@@ -344,7 +345,7 @@ const Download = (props) => {
                     <CircularProgress/>
                     </Grid>
                     }
-                    <Test/>
+
                   </Grid>
                 </Paper>
               </Grid>
