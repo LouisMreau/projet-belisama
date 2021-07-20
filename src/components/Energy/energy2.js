@@ -17,40 +17,58 @@ import dataDetector from '../../resources/data/data_detector.json';
 
 /**
 * @author
-* @function Energy
+* @function Energy2
 **/
 
 
 
-const Energy = (props) => {
-    const detectorId  = props.detectorId;
-    const dataLean = props.dataLean;
-    var installation_date = dataDetector.filter(function (detector) {
-      return (detector.id == detectorId);
-      })[0].installation_date
-    installation_date = installation_date + 'T00:00:00'
+const Energy2 = (props) => {
+    const detectorId1  = props.detectorId1;
+    const detectorId2  = props.detectorId2;
+  
+    var installation_date1 = dataDetector.filter(function (detector1) {
+        return (detector1.id == detectorId1);
+        })[0].installation_date
+        
+        var installation_date2 = dataDetector.filter(function (detector2) {
+            return (detector2.id == detectorId2);
+            })[0].installation_date
+
+    installation_date1 = installation_date1 + 'T00:00:00'
+    installation_date2 = installation_date2 + 'T00:00:00'
+
+    const maximumOfTwoDates = (date1, date2) => {
+        return (date1 > date2 ? date1 : date2)
+    }
+
+    const installation_date = maximumOfTwoDates(installation_date1, installation_date2)
+    var dataLean1 = props.dataLean1;
+    var dataLean2 = props.dataLean2;
+
     // Décalage horaire de 2 heures à prendre en compte 
-    const [spectrumTimeValue, setSpectrumTimeValue] = useState([new Date(installation_date),new Date(dataLean[0][1] - 2*3600*1000)]);
-    const [spectrumData, setSpectrumData] = useState([]);
+    const [spectrumTimeValue, setSpectrumTimeValue] = useState([new Date(installation_date),new Date(dataLean1[0][1] - 2*3600*1000)]);
+    const [spectrumData1, setSpectrumData1] = useState([]);
+    const [spectrumData2, setSpectrumData2] = useState([]);
 
 
 
   useEffect(() => {
-    if (dataLean.length > 0) { setSpectrum(dataLean) }
+    if (dataLean1.length > 0) { setSpectrum(dataLean1, dataLean2) }
   },[spectrumTimeValue]);
 
 
 
   useEffect(() => {
-    if (dataLean.length > 0) {
+    if (dataLean1.length > 0) {
       // Décalage horaire de 2 heures à prendre en compte 
-      setSpectrumTimeValue([new Date(installation_date),new Date(dataLean[0][1]- 2*3600*1000)])
+      setSpectrumTimeValue([new Date(installation_date),new Date(dataLean1[0][1]- 2*3600*1000)])
     }
-  },[dataLean])
+  },[dataLean1, dataLean2])
+  
 
   // On définit les heures limites du jeu de données traitées, attention, le fuseau horaire n'est pas le même
-  const start_date_limit = moment(new Date(dataLean[0][0]))
-  const end_date_limit = moment(new Date(dataLean[0][1]- 2*3600*1000))
+  const start_date_limit = moment(new Date(dataLean1[0][0]))
+  const end_date_limit = moment(new Date(dataLean1[0][1]- 2*3600*1000))
 
 
   const handleSpectrumTimeChange = (isEndTime, newValue) => {
@@ -92,12 +110,18 @@ const Energy = (props) => {
     return [energies,densities]
   };
 
-  const setSpectrum = (dataLean) => {
-    let start_time = (spectrumTimeValue[0].getTime()-dataLean[0][0])/1000/3600
-    let end_time = (spectrumTimeValue[1].getTime()-dataLean[0][0])/1000/3600
-    let data = loadSpectrum(dataLean,start_time,end_time, dataLean[0][3])
-    data = createChartData(data[0],data[1])
-    setSpectrumData(data)
+  const setSpectrum = (dataLean1, dataLean2) => {
+    let start_time1 = (spectrumTimeValue[0].getTime()-dataLean1[0][0])/1000/3600
+    let end_time1 = (spectrumTimeValue[1].getTime()-dataLean1[0][0])/1000/3600
+    let start_time2 = (spectrumTimeValue[0].getTime()-dataLean2[0][0])/1000/3600
+    let end_time2 = (spectrumTimeValue[1].getTime()-dataLean2[0][0])/1000/3600
+    let data1 = loadSpectrum(dataLean1,start_time1,end_time1, dataLean1[0][3])
+    let data2 = loadSpectrum(dataLean2,start_time2,end_time2, dataLean2[0][3])
+    data1 = createChartData(data1[0],data1[1])
+    data2 = createChartData(data2[0],data2[1])
+    setSpectrumData1(data1)
+    setSpectrumData2(data2)
+
   } 
 
 
@@ -176,9 +200,14 @@ const Energy = (props) => {
 
 
   var series = [{
-    name: 'densité',
-    data: spectrumData
-  }]
+    name: detectorId1,
+    data: spectrumData1
+  }, 
+  {
+    name: detectorId2,
+    data: spectrumData2
+  }
+]
 
   const options = {
     chart: {
@@ -193,22 +222,22 @@ const Energy = (props) => {
       toolbar: {
         export: {
           csv: {
-            filename: "spectre_energie_" + detectorId,
+            filename: "spectre_energie_" + detectorId1 + '_' + detectorId2,
             columnDelimiter: ';',
             headerCategory: 'Energie',
             headerValue: 'Densité',
           },
           svg: {
-            filename:  "spectre_energie_" + detectorId,
+            filename:  "spectre_energie_"+ detectorId1 + '_' + detectorId2,
           },
           png: {
-            filename:  "spectre_energie_" + detectorId,
+            filename:  "spectre_energie_"+ detectorId1 + '_' + detectorId2,
           }
         },
         autoSelected: 'zoom'
       }
     },
-    colors:['#09476e'],
+    // colors:['#09476e'],
     stroke: {
       show: true,
       curve: 'smooth',
@@ -327,24 +356,20 @@ const Energy = (props) => {
                     showTimeInput 
                     selected={spectrumTimeValue[0]} 
                     onChange={date => {
-                      if ((date.getTime() > dataLean[0][1] -2*3600*1000) ||(date.getTime() < dataLean[0][0]) ) {
-                        alert("Erreur : Merci de bien sélectionner une date entre " + start_date_limit.format("DD/MM/YYYY HH:mm:ss") + ' et '+ end_date_limit.format("DD/MM/YYYY HH:mm:ss")  );
-                      } else handleSpectrumTimeChange(false,date)}} />
+                      handleSpectrumTimeChange(false,date)}} />
               </Grid>
               <Grid item xs={12} sm = {6}>
                 <p style={{marginLeft:"20px",marginRight:"20px", marginTop : "20px"}}>Fin</p>
                 <DatePicker 
                   minDate={spectrumTimeValue[0]} 
-                  maxDate={new Date(dataLean[0][1]-2*3600*1000)}               
+                  maxDate={new Date(dataLean1[0][1]-2*3600*1000)}               
                   timeInputLabel="Heure :"
                   timeFormat="HH:mm"
                   dateFormat="dd/MM/yyyy HH:mm"
                   showTimeInput  
                   selected={spectrumTimeValue[1]} 
                   onChange={date => { 
-                    if ((date.getTime() > dataLean[0][1] -2*3600*1000) ||(date.getTime() < dataLean[0][0]) ) {
-                    alert("Erreur : Merci de bien sélectionner une date entre " + start_date_limit.format("DD/MM/YYYY HH:mm:ss") + ' et '+ end_date_limit.format("DD/MM/YYYY HH:mm:ss")  );
-                  } else handleSpectrumTimeChange(true,date)}} />
+                     handleSpectrumTimeChange(true,date)}} />
               </Grid>
         </Grid>
         </Grid>
@@ -369,4 +394,4 @@ const Energy = (props) => {
 
  }
 
-export default Energy
+export default Energy2

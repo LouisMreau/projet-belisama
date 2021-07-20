@@ -18,41 +18,59 @@ import dataDetector from '../../resources/data/data_detector.json';
 
 /**
 * @author
-* @function Count
+* @function Count2
 **/
 
 
 
-const Count = (props) => {
-  const detectorId  = props.detectorId;
-  var installation_date = dataDetector.filter(function (detector) {
-    return (detector.id == detectorId);
+const Count2 = (props) => {
+  const detectorId1  = props.detectorId1;
+  const detectorId2  = props.detectorId2;
+  
+  var installation_date1 = dataDetector.filter(function (detector1) {
+    return (detector1.id == detectorId1);
     })[0].installation_date
-  installation_date = installation_date + 'T00:00:00'
-  var dataLean = props.dataLean;
-  const [countSliderValue, setCountSliderValue] = useState([dataLean[0][2], dataLean[0][2]+7000]);
+    
+    var installation_date2 = dataDetector.filter(function (detector2) {
+        return (detector2.id == detectorId2);
+        })[0].installation_date
+
+  installation_date1 = installation_date1 + 'T00:00:00'
+  installation_date2 = installation_date2 + 'T00:00:00'
+
+  const maximumOfTwoDates = (date1, date2) => {
+    return (date1 > date2 ? date1 : date2)
+  }
+
+  const installation_date = maximumOfTwoDates(installation_date1, installation_date2)
+  var dataLean1 = props.dataLean1;
+  var dataLean2 = props.dataLean2;
+
+  // Choix du detecteur arbitraire pour le slider puisque même min et max
+  const [countSliderValue, setCountSliderValue] = useState([dataLean1[0][2], dataLean1[0][2]+7000]);
   // Décalage horaire de 2 heures à prendre en compte 
-  const [countTimeValue, setCountTimeValue] = useState([new Date(installation_date),new Date(dataLean[0][1]- 2*3600*1000)]);
-  const [countData, setCountData] = useState([]);
+  const [countTimeValue, setCountTimeValue] = useState([new Date(installation_date),new Date(dataLean1[0][1]- 2*3600*1000)]);
+  const [countData1, setCountData1] = useState([]);
+  const [countData2, setCountData2] = useState([]);
   const isLoadinData = props.isLoadinData; 
   const loadingMessage = props.loadingMessage;
 
 
 
   useEffect(() => {
-    if (dataLean.length > 0) 
-    { setCountSerie(dataLean) }
+    if ((dataLean1.length > 0) && (dataLean2.length > 0)) 
+    { setCountSerie(dataLean1, dataLean2) }
   },[countTimeValue,countSliderValue]);
 
 
   useEffect(() => {
-    if (dataLean.length > 0) {
-      setCountSliderValue([dataLean[0][2], dataLean[0][2]+7000])
+    if ((dataLean1.length > 0) && (dataLean2.length > 0))  {
+      setCountSliderValue([dataLean1[0][2], dataLean1[0][2]+7000])
       // Décalage horaire de 2 heures à prendre en compte 
-      setCountTimeValue([new Date(installation_date),new Date(dataLean[0][1]- 2*3600*1000)])
+      setCountTimeValue([new Date(installation_date),new Date(dataLean1[0][1]- 2*3600*1000)])
     }
   }
-  ,[props.dataLean]
+  ,[props.dataLean1, props.dataLean2]
   )
 
 
@@ -64,6 +82,7 @@ const Count = (props) => {
     if (isEndTime) { setCountTimeValue([countTimeValue[0],newValue]); }
     else { setCountTimeValue([newValue,countTimeValue[1]]); }
   };
+
 
 
 
@@ -86,14 +105,19 @@ const Count = (props) => {
     return [times,counts]
   }
 
-  const setCountSerie = (dataLean) => {
-    let start_energy  = Math.trunc((countSliderValue[0]-dataLean[0][2])/dataLean[0][3])
-    let end_energy = Math.trunc((countSliderValue[1]-dataLean[0][2])/dataLean[0][3])
-    let start_time = (countTimeValue[0].getTime()-dataLean[0][0])/1000/3600
-    let end_time = Math.trunc((countTimeValue[1].getTime()-dataLean[0][0])/1000/3600)
-    let data = loadCountSerie(dataLean,start_energy, end_energy,start_time,end_time)
-    data = createChartData(data[0],data[1])
-    setCountData(data)
+  const setCountSerie = (dataLean1, dataLean2) => {
+    let start_energy  = Math.trunc((countSliderValue[0]-dataLean1[0][2])/dataLean1[0][3])
+    let end_energy = Math.trunc((countSliderValue[1]-dataLean1[0][2])/dataLean1[0][3])
+    let start_time1 = Math.trunc((countTimeValue[0].getTime()-dataLean1[0][0])/1000/3600)
+    let end_time1 = Math.trunc((countTimeValue[1].getTime()-dataLean1[0][0])/1000/3600)
+    let start_time2 = Math.trunc((countTimeValue[0].getTime()-dataLean2[0][0])/1000/3600)
+    let end_time2 = Math.trunc((countTimeValue[1].getTime()-dataLean2[0][0])/1000/3600)
+    let data1 = loadCountSerie(dataLean1,start_energy, end_energy,start_time1,end_time1)
+    let data2 = loadCountSerie(dataLean2,start_energy, end_energy,start_time2,end_time2)
+    data1 = createChartData(data1[0],data1[1])
+    data2 = createChartData(data2[0],data2[1])
+    setCountData1(data1)
+    setCountData2(data2)
   }
 
 
@@ -127,10 +151,17 @@ const Count = (props) => {
     a.dispatchEvent(e)
   }
 
-  var series = [{
-    name: 'Nombre de photons par heure',
-    data: countData
-  }]
+  var series = [
+    {
+    name: detectorId1,
+    data: countData1
+    }, 
+    {
+    name: detectorId2,
+    data: countData2
+    }, 
+
+]
 
   const options = {
     chart: {
@@ -154,22 +185,22 @@ const Count = (props) => {
         },
         export: {
           csv: {
-            filename: 'comptage_' + detectorId,
+            filename: 'comptage_' + detectorId1 + '_' + detectorId2,
             columnDelimiter: ';',
             headerCategory: 'Date',
             headerValue: 'Nombre de photons par heure',
             dateFormatter : function(x) {return x.toLocaleString();},
           },
           svg: {
-            filename: "comptage_"+ detectorId,
+            filename: "comptage_"+ detectorId1 + '_' + detectorId2,
           },
           png: {
-            filename: "comptage_"+ detectorId,
+            filename: "comptage_"+ detectorId1 + '_' + detectorId2,
           }
         },
       },
     },
-    colors:['#09476e'],
+    
     stroke: {
       show: true,
       curve: 'smooth',
@@ -282,7 +313,7 @@ const Count = (props) => {
             </Grid>
             <Grid item xs={12} sm = {6}> 
               <p style={{marginLeft:"20px",marginRight:"20px", marginTop : '20px'}}>Fin</p>
-              <DatePicker minDate={countTimeValue[0]} maxDate={new Date(dataLean[0][1]- 2*3600*1000)} dateFormat="dd/MM/yyyy" selected={countTimeValue[1]} onChange={date => handleCountTimeChange(true,date)} />
+              <DatePicker minDate={countTimeValue[0]} maxDate={new Date(dataLean1[0][1]- 2*3600*1000)} dateFormat="dd/MM/yyyy" selected={countTimeValue[1]} onChange={date => handleCountTimeChange(true,date)} />
             </Grid>
             </Grid>
             </Grid>
@@ -295,14 +326,14 @@ const Count = (props) => {
          
           <Grid item xs={9} >
             <Slider
-            min={dataLean[0][2]}
-            max={dataLean[0][2]+dataLean[0][3]*dataLean[0][4]}
-            step={dataLean[0][3]}
+            min={dataLean1[0][2]}
+            max={dataLean1[0][2]+dataLean1[0][3]*dataLean1[0][4]}
+            step={dataLean1[0][3]}
             value={countSliderValue}
             onChange={handleCountSliderChange}
             valueLabelDisplay="auto"
             aria-labelledby="range-slider"
-            marks={[{value:dataLean[0][2],label:dataLean[0][2].toString()+" keV"},{value:dataLean[0][2]+dataLean[0][3]*dataLean[0][4],label:(dataLean[0][2]+dataLean[0][3]*dataLean[0][4]).toString()+" keV"}]}
+            marks={[{value:dataLean1[0][2],label:dataLean1[0][2].toString()+" keV"},{value:dataLean1[0][2]+dataLean1[0][3]*dataLean1[0][4],label:(dataLean1[0][2]+dataLean1[0][3]*dataLean1[0][4]).toString()+" keV"}]}
             />
           
           </Grid>
@@ -331,4 +362,4 @@ const Count = (props) => {
 
  }
 
-export default Count
+export default Count2

@@ -3,8 +3,8 @@
         "name": "Observatoire de Meudon",
         "id" : "obsmeudon",
         "place": "Observatoire de Meudon, Meudon",
-        "contact": "Jean Dupont, jeandupont@exemple.com",
-        "installation_date": "24/03/2020",
+        "contact": "",
+        "installation_date": "2021-06-24",
         "position" : [48.80496, 2.23108]
     },
     {
@@ -12,7 +12,15 @@
         "id" : "LCSC",
         "place": "Lycée Corneille, La Celle Saint Cloud",
         "contact": "Caroline Ladent, carolineladent@exemple.com",
-        "installation_date": "24/03/2020",
+        "installation_date": "2021-05-13",
         "position" : [48.8461, 2.13648]
+    },
+    {
+        "name": "Lycée Marie Curie",
+        "id" : "MCSceaux",
+        "place": "Lycée Marie Curie, Sceaux",
+        "contact": "",
+        "installation_date": "2021-07-12",
+        "position" : [48.7775366, 2.2874174]
     }
 ]

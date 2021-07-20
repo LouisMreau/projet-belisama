@@ -1,13 +1,7 @@
 import {React, useState, useEffect, useRef, Component } from 'react'
 import './style.css'
 import {Link, useParams} from "react-router-dom";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend,ResponsiveContainer } from 'recharts';
-import moment from 'moment'
-// import dataLean2 from '../../resources/data/data_lean.json'
-// import dataLean3 from '../../resources/data/data_lean20210605.json'
-import Slider from '@material-ui/core/Slider';
 
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
 
@@ -16,7 +10,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import PropTypes from 'prop-types';
-import csvjson from 'csvjson'
+
 
 
 import Download from '../Download/index';
@@ -32,10 +26,6 @@ import Energy from '../Energy/energy';
 
 const DataVisu = (props) => {
   let { detectorId } = useParams();
-
-  const [spectrumTimeValue, setSpectrumTimeValue] = useState([]);
-  const [spectrumData, setSpectrumData] = useState([]);
-
   const [dataLean, setDataLean] = useState([]);
   const [isLoadinData, setIsLoadingData] = useState(true); 
   const [loadingMessage, setloadingMessage] = useState("Chargement des données du détecteur..."); 
@@ -47,11 +37,10 @@ const DataVisu = (props) => {
   },[])
 
   const loadData = async () => {
-    await axios.get('https://data-belisama.s3.eu-west-3.amazonaws.com/'+detectorId+'/data_lean.json')
+    await axios.get('https://data-belisama.s3.eu-west-3.amazonaws.com/'+detectorId+'/data_lean_update.json')
         .then(response => {
             setDataLean(response.data)
             setIsLoadingData(false)
-            
           })
         .catch(error => {
           console.log("Détecteur introuvable")
@@ -132,7 +121,7 @@ const DataVisu = (props) => {
       <Energy dataLean = {dataLean} detectorId = {detectorId} />
     </TabPanel>
     <TabPanel value={value} index={2}>
-      <Download dataLean={dataLean} detectorId = {detectorId}/>
+      <Download dataLean ={dataLean} detectorId = {detectorId}/>
     </TabPanel>
     
 

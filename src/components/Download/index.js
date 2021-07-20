@@ -4,13 +4,12 @@ import moment from 'moment'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {Grid, Container, Button, Paper, Box, Typography, CircularProgress} from '@material-ui/core';
-import csvjson from 'csvjson'
 import JSZip from 'jszip';
 import JSZipUtils from 'jszip-utils'
 import FileSaver from 'file-saver';
 
 
-import Test from '../Test/index'
+import dataDetector from '../../resources/data/data_detector.json';
 
 
 /**
@@ -21,6 +20,10 @@ import Test from '../Test/index'
 
 
 const Download = (props) => {
+  var installation_date = dataDetector.filter(function (detector) {
+    return (detector.id == props.detectorId);
+    })[0].installation_date
+  installation_date = installation_date + 'T00:00:00'
 
   const [downloadTimeValue, setDownloadTimeValue] = useState([]);
   const [downloadRawTimeValue, setDownloadRawTimeValue] = useState([]);
@@ -29,50 +32,36 @@ const Download = (props) => {
   const [monthFileList, setMonthFileList] = useState([]);
   const [isDownloadinData, setIsDownloadingData] = useState(false);
   const [isDownloadinMonthData, setIsDownloadingMonthData] = useState(false);
-  const [downloadingMessage, setDownloadingMessage] = useState("Chargement des données...");  
-  
-  const ListRef = useRef(false);
-  const MonthListRef = useRef(false);
+
   const today = new Date()
-  const yesterday = new Date().setDate(today.getDate() - 1)
-  const firstDayofMonth = new Date().setDate(1)
+  var yesterday = new Date()
+  yesterday.setDate(today.getDate() - 1)
+  yesterday.setHours(today.getHours() - 5)
+  const firstDayofMonth = (date) => {
+    var firstDay = new Date()
+    if ((date.getDate() === 1) && (date.getHours() < 5)){
+      firstDay.setMonth(date.getMonth() - 1)
+    }
+    firstDay.setDate(1)
+    return firstDay
+  }
+  
   const oneMonthAgo = (date) => {
     const previousMonth = new Date();
-    previousMonth.setMonth(date.getMonth() - 1);
+    previousMonth.setMonth(date.getMonth() - 1)
+    previousMonth.setHours(date.getHours() - 10)
     return previousMonth
   }
 
-  var AWS = require('aws-sdk');
-  AWS.config.update(
-    {
-      // accessKeyId: "AKIAUS5DHFAYTT34JPZ6",
-      // secretAccessKey: "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",
-      accessKeyId: "AKIAUS5DHFAYWPXFTIOH",
-      secretAccessKey: "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",
-    }
-    );
-    
-  var s3 = new AWS.S3();
 
-  useEffect(() => {
-      if(ListRef.current){
-      ListRef.current = false;
-      zipMultipleFiles(fileList);
-      }
-  },[fileList])
 
-  useEffect(() => {
-    if(MonthListRef.current){
-      MonthListRef.current = false;
-    zipMultipleFiles(monthFileList);
-    }
-},[monthFileList])
 
   useEffect(() => {
       if (props.dataLean.length > 0) {
-        setDownloadTimeValue([new Date(props.dataLean[0][0]),new Date(props.dataLean[0][1])])
         setDownloadRawTimeValue([yesterday,yesterday])
-        setDownloadRawMonthValue(oneMonthAgo(today))
+      // if (firstDayofMonth(new Date(installation_date)) <= oneMonthAgo(today)){
+      //   setDownloadRawMonthValue(oneMonthAgo(today))
+      // }
       }
     },[props.dataLean])
 
@@ -140,14 +129,19 @@ const Download = (props) => {
         });
     });
     }
+  
 
   const fileNaming = (text) => {
     const regex = /[0-9]{6,}/g;
     return text.slice(text.search(regex))
   }
 
-  // Option 1
-  const zipMultipleFiles = (fileList) => {
+
+
+  
+
+
+  const zipMultipleFiles = (fileList, fileName) => {
     // ----------------------- Telechargement et zip -----------------------
     var zip = new JSZip();  
     fileList.map((item, index) => {
@@ -155,7 +149,7 @@ const Download = (props) => {
     })
     zip.generateAsync({type:"blob"})
         .then(function (content) {
-            FileSaver.saveAs(content, "donnees_brutes.zip");
+            FileSaver.saveAs(content, fileName);
             setIsDownloadingData(false)
             setIsDownloadingMonthData(false)
           })
@@ -163,89 +157,36 @@ const Download = (props) => {
 
 
 
-    
-
-
-  // Option 1
-
-  function downloadMonthRawFile(download_month_year, detector_id) {
-    return new Promise(function(resolve, reject) {
-    var AWS = require('aws-sdk');
-    AWS.config.update(
-      {
-        accessKeyId: "AKIAUS5DHFAYTT34JPZ6",
-        secretAccessKey: "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",
-      }
-      );
-      
-    var s3 = new AWS.S3();
-    var month_year = moment([download_month_year.getFullYear(), download_month_year.getMonth()])
-    var bucketParams = {
-      Bucket: "data-belisama",
-      // Prefix: detector_id + '/' + month_year.format('YYYYMM').toString() + '/' 
-      Prefix: detector_id + '/' + 'zipFiles' + '/' + month_year.format('YYYYMM').toString()
-    };
-
-    
-      
-      s3.listObjects(bucketParams, function(err, data) {
-        if (err) console.log(err); // an error occurred
-        else if (data.Contents.length == 0) {
-          alert("Aucune donnée à la date sélectionnée");
-        } else {
-          var table = [];
-          data.Contents.forEach(obj => {
-            var suffixe = obj.Key.toString()
-            table.push("https://data-belisama.s3.eu-west-3.amazonaws.com/" + suffixe) 
-          })
-          resolve(table)
-          // MonthListRef.current = true;
-          // setMonthFileList(table)
-        }
-        })
-        
-  })}
-
   function download_onceMonth(download_month_year, detector_id) {
-    setIsDownloadingMonthData(true)
-    downloadMonthRawFile(download_month_year, detector_id).then((table) => {zipMultipleFiles(table)})
+    const month_year = moment([download_month_year.getFullYear(), download_month_year.getMonth()])
+    const suffixe = detector_id + '/' + 'zipFiles' + '/' + month_year.format('YYYYMM').toString() + '.zip'
+
+    var link = document.createElement("a");
+    link.download = detector_id + "_" + month_year.format('YYYYMM').toString() + '.zip';
+    link.href = "https://data-belisama.s3.eu-west-3.amazonaws.com/" + suffixe;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
   }
 
-    // Option 2
 
-
-    
   
 
-  function download_RawFile(download_day, detector_id, s3, table) {
+  function download_RawFile(download_day, detector_id, table) {
     return new Promise(function(resolve, reject) {
     var day = moment([download_day.getFullYear(), download_day.getMonth(), download_day.getDate()])
-    var bucketParams = {
-      Bucket: "data-belisama",
-      // Prefix: detector_id + '/' + day.format('YYYYMM').toString() + '/' + day.format('YYYYMMDD').toString()
-      Prefix: detector_id + '/' + 'zipFiles' + '/' + day.format('YYYYMMDD').toString()
-    };
-    s3.listObjects(bucketParams, function(err, data) {
-        if (err) console.log(err); // an error occurred
-        else if (data.Contents.length == 0) {
-          alert("Aucune donnée à la date sélectionnée");
-        } else {
-          data.Contents.forEach(obj => {
-            var suffixe = obj.Key.toString()
-            table.push("https://data-belisama.s3.eu-west-3.amazonaws.com/" + suffixe) 
-          })
-          
-        }
-        resolve(table)
-        })   
-  })}
+    var suffixe = detector_id + '/' + 'zipFiles' + '/' + day.format('YYYYMMDD').toString() + '.zip'
+    table.push("https://data-belisama.s3.eu-west-3.amazonaws.com/" + suffixe) 
+    resolve(table)
+      })}
 
   async function downloadMultipleDayData(startDate, endDate, detector_id) {
 
     var table = [];
     var download_day = new Date(startDate)
     while(download_day <= endDate){   
-      table = await download_RawFile(download_day, detector_id, s3, table)   
+      table = await download_RawFile(download_day, detector_id, table)  
       var newDate = download_day.setDate(download_day.getDate() + 1);
       download_day = new Date(newDate);
     }
@@ -254,7 +195,13 @@ const Download = (props) => {
     
   const download_once = (startDate, endDate, detector_id) => {
     setIsDownloadingData(true)
-    downloadMultipleDayData(startDate, endDate, detector_id).then((table) => {zipMultipleFiles(table)})
+    var start = moment([startDate.getFullYear(), startDate.getMonth(), startDate.getDate()])
+    var end = moment([endDate.getFullYear(), endDate.getMonth(), endDate.getDate()])
+    downloadMultipleDayData(startDate, endDate, detector_id).then((table) => {zipMultipleFiles(table, props.detectorId.toString() + "_" + start.format('YYYYMMDD').toString() + '_' +  end.format('YYYYMMDD').toString() + ".zip")})
+  }
+
+  const maximumOfTwoDates = (date1, date2) => {
+    return (date1 > date2 ? date1 : date2)
   }
 
 
@@ -262,7 +209,7 @@ const Download = (props) => {
 
     return (
 
-            // <Paper> 
+
               <Grid container justify = 'center' alignItems = 'center' className="download-container">
               <Grid item xs={12}>
                 <Grid item xs={12}>
@@ -276,7 +223,11 @@ const Download = (props) => {
                         <h6 className = 'title' style={{marginTop: "20px", marginBottom: "20px"}}>Données traitées</h6>
                         </Grid>
                         <Grid>
-                        <Button classname = 'download_button' onClick={() => downloadAsJsonFile(props.dataLean, "dataLean.json")}>Téléchargement des données traitées</Button>
+                        <Box margin = '2em' color = 'white'>
+                        </Box>
+                        <Button  variant="contained" classname = 'download_button' onClick={() => downloadAsJsonFile(props.dataLean, props.detectorId.toString() + "_dataLean.json")}>Téléchargement des données traitées</Button>
+                        <Box margin = '1em' color = 'white'>
+                        </Box>
                         </Grid>
                       </Grid>
                     </Paper>
@@ -294,7 +245,7 @@ const Download = (props) => {
                     <Grid container direction="row" justify="center" className="periode-container">
                       <Grid item xs={12} sm = {6}>
                         <p style={{marginRight:"20px", marginLeft:"20px", marginTop : '15px', marginBottom : '15px'}}>Début</p>
-                        <DatePicker minDate={firstDayofMonth} maxDate={new Date(downloadRawTimeValue[1]).getTime()} dateFormat="dd/MM/yyyy" selected={downloadRawTimeValue[0]} onChange={date => handleDownloadRawTimeChange(false,date)} />
+                        <DatePicker minDate={maximumOfTwoDates(firstDayofMonth(today), new Date(installation_date))} maxDate={new Date(downloadRawTimeValue[1]).getTime()} dateFormat="dd/MM/yyyy" selected={downloadRawTimeValue[0]} onChange={date => handleDownloadRawTimeChange(false,date)} />
                       </Grid>
                       <Grid item xs={12} sm = {6}> 
                         <p style={{marginLeft:"20px",marginRight:"20px", marginTop : '15px', marginBottom : '15px'}}>Fin</p>
@@ -303,11 +254,14 @@ const Download = (props) => {
                     </Grid> 
 
                     <Grid>
-                      <Button classname = 'download_button' onClick={() => download_once(new Date(downloadRawTimeValue[0]), new Date(downloadRawTimeValue[1]), props.detectorId)}>Téléchargement des données brutes</Button>
+                      <Button variant="contained" classname = 'download_button' onClick={() => download_once(new Date(downloadRawTimeValue[0]), new Date(downloadRawTimeValue[1]), props.detectorId)}>Téléchargement des données brutes</Button>
+                      <Box margin = '1em' color = 'white'>
+                        </Box>
                     </Grid>
 
                     { isDownloadinData && 
                     <Grid item xs={12}>
+                       <Box margin = '2em' color = 'white'></Box>
                     <CircularProgress/>
                     </Grid>
                     }
@@ -321,13 +275,13 @@ const Download = (props) => {
                 <Paper square>
                   <Grid item justify = 'center'  className = 'download_data'>   
                     <Grid>
-                      <h6 className = 'title' style={{margin: "20px"}}>Données brutes par mois </h6>
+                      <h6 className = 'title' style={{margin: "20px"}}>Archives </h6>
                     </Grid> 
                     <Grid container direction="row" justify="center" className="periode-container">
                       <Grid item xs={12} sm = {6}>
                         <p style={{marginRight:"20px", marginLeft:"20px", marginTop : '15px', marginBottom : '15px'}}>Mois</p>
                         <DatePicker
-                          minDate={new Date('05-01-2021')}
+                          minDate={new Date(installation_date).setDate(1)}
                           maxDate = {oneMonthAgo(today)}
                           selected={downloadRawMonthValue}
                           onChange={(date) => setDownloadRawMonthValue(date)}
@@ -338,10 +292,21 @@ const Download = (props) => {
                       </Grid>
                     </Grid> 
                     <Grid>
-                      <Button classname = 'download_button' onClick={() => {download_onceMonth(downloadRawMonthValue, props.detectorId)}}>Téléchargement des données brutes</Button>
+                      <Button  variant="contained" classname = 'download_button' onClick={() => {
+                        try {
+                          download_onceMonth(downloadRawMonthValue, props.detectorId)
+                        }
+                        catch(err) {
+                          alert('Données non disponibles')
+                          setIsDownloadingMonthData(false)
+                        }
+                        }}>Téléchargement des données brutes</Button>
+                      <Box margin = '1em' color = 'white'>
+                        </Box>
                     </Grid>
                     { isDownloadinMonthData &&
                       <Grid item xs={12}>
+                      <Box margin = '2em' color = 'white'></Box>
                     <CircularProgress/>
                     </Grid>
                     }
@@ -354,7 +319,7 @@ const Download = (props) => {
                 </Grid>
                 </Grid>
               </Grid>
-            // </Paper> 
+
 
 
 
