@@ -9,15 +9,17 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
 
-import {Grid, Container, Button, Paper, Box, Typography} from '@material-ui/core';
+import {Grid, Container, Button, Paper, Box, Typography, FormControlLabel, Switch} from '@material-ui/core';
 import csvjson from 'csvjson'
 
 import dataDetector from '../../resources/data/data_detector.json';
-
+import EnergyViewer from '../Chart/EnergyViewer'
 
 /**
 * @author
 * @function Energy2
+* Permet à l'utilisateur de sélectionner deux détecteurs pour l'étude du spectre en énergie
+* Construit le nuage de points pour le spectre en énergie et appelle EnergyViewer pour afficher le graphique
 **/
 
 
@@ -49,11 +51,45 @@ const Energy2 = (props) => {
     const [spectrumTimeValue, setSpectrumTimeValue] = useState([new Date(installation_date),new Date(dataLean1[0][1] - 2*3600*1000)]);
     const [spectrumData1, setSpectrumData1] = useState([]);
     const [spectrumData2, setSpectrumData2] = useState([]);
+    const [dataDiff, setEnergyDifference] = useState([]);
+    const name = [[detectorId1, detectorId2], 'Spectre en énergie']
+    const nameDiff = [["Différence détecteur1 - détecteur2"], "Différence détecteur1 - détecteur2"]
+    const [loadingData, setLoadingData] = useState(false)
+    const [switchState, setSwitchState] = useState(false);
+  
+    const handleChangeSwitch = (event) => {
+      setLoadingData(true)
+      setSwitchState(event.target.checked)
+    };
 
 
 
   useEffect(() => {
-    if (dataLean1.length > 0) { setSpectrum(dataLean1, dataLean2) }
+    if (switchState) {
+      switchToLogarithmData(spectrumData1, spectrumData2).then((data1, data2) => {
+          setSpectrumData1(data1)
+          setSpectrumData2(data2)
+        })}
+    else {
+      setSpectrum(dataLean1, dataLean2)
+      }
+  setLoadingData(false)
+  }
+  ,[switchState])
+
+  useEffect(()=> {
+    if (switchState)
+    switchToLogarithmDifference(dataDiff).then((data) => {
+      setEnergyDifference(data)
+    })
+  }, [switchState])
+
+
+  useEffect(() => {
+    if (dataLean1.length > 0) { 
+      setSpectrum(dataLean1, dataLean2) 
+      setSwitchState(false)
+    }
   },[spectrumTimeValue]);
 
 
@@ -62,6 +98,7 @@ const Energy2 = (props) => {
     if (dataLean1.length > 0) {
       // Décalage horaire de 2 heures à prendre en compte 
       setSpectrumTimeValue([new Date(installation_date),new Date(dataLean1[0][1]- 2*3600*1000)])
+      setSwitchState(false)
     }
   },[dataLean1, dataLean2])
   
@@ -117,18 +154,46 @@ const Energy2 = (props) => {
     let end_time2 = (spectrumTimeValue[1].getTime()-dataLean2[0][0])/1000/3600
     let data1 = loadSpectrum(dataLean1,start_time1,end_time1, dataLean1[0][3])
     let data2 = loadSpectrum(dataLean2,start_time2,end_time2, dataLean2[0][3])
+    let dataDifference = [[],[]]
+    dataDifference[0] = data1[0]
+    dataDifference[1] = data1[1].map(function(item, index) {
+      return item - data2[1][index];
+    })
+  
     data1 = createChartData(data1[0],data1[1])
     data2 = createChartData(data2[0],data2[1])
+    dataDifference = createChartData(dataDifference[0], dataDifference[1])
     setSpectrumData1(data1)
     setSpectrumData2(data2)
+    setEnergyDifference(dataDifference)
 
   } 
 
 
-  const diff_date_in_hour = (date1,date2) => {
-    var diff_time = date2.getTime()-date1.getTime()
-    return diff_time / (1000 * 3600);
+  async function switchToLogarithmData(data1, data2) {
+    let logData1 = data1
+    let logData2 = data2
+    for (let key in logData1) {
+      let y1 = logData1[key].y;
+      let y2 = logData2[key].y;
+      y1 = Math.log(y1)
+      y2 = Math.log(y2)
+      logData1[key].y = y1
+      logData2[key].y = y2
+    }
+    return Promise.resolve(logData1, logData2)
+}
+
+async function switchToLogarithmDifference(data) {
+  let logDataDiff = data
+  for (let key in logDataDiff) {
+    let y3 = logDataDiff[key].y;
+    y3 = Math.abs(y3);
+    y3 = Math.log(y3)
+    logDataDiff[key].y = y3
   }
+  return Promise.resolve(logDataDiff)
+}
 
  
 
@@ -184,149 +249,8 @@ const Energy2 = (props) => {
     e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
     a.dispatchEvent(e)
   }
-
-  const CustomizedDot = (props) => {
-    const { cx, cy, stroke, payload, value } = props;
   
-    if (cx % 10 == 0) {
-      return (
-        <svg x={cx - 10} y={cy - 10} width={20} height={20} fill="red" viewBox="0 0 1024 1024">
-        </svg>
-      );
-    }
-  
-  };
 
-
-
-  var series = [{
-    name: detectorId1,
-    data: spectrumData1
-  }, 
-  {
-    name: detectorId2,
-    data: spectrumData2
-  }
-]
-
-  const options = {
-    chart: {
-      type: 'line',
-      stacked: false,
-      width: '100%',
-      zoom: {
-        type: 'x',
-        enabled: true,
-        autoScaleYaxis: true
-      },
-      toolbar: {
-        export: {
-          csv: {
-            filename: "spectre_energie_" + detectorId1 + '_' + detectorId2,
-            columnDelimiter: ';',
-            headerCategory: 'Energie',
-            headerValue: 'Densité',
-          },
-          svg: {
-            filename:  "spectre_energie_"+ detectorId1 + '_' + detectorId2,
-          },
-          png: {
-            filename:  "spectre_energie_"+ detectorId1 + '_' + detectorId2,
-          }
-        },
-        autoSelected: 'zoom'
-      }
-    },
-    // colors:['#09476e'],
-    stroke: {
-      show: true,
-      curve: 'smooth',
-      width: 1.5,
-      dashArray: 0,      
-    },
-    dataLabels: {
-      enabled: false
-    },
-    markers: {
-      size: 0,
-    },
-    title: {
-      text: 'Spectre en énergie',
-      align: 'left'
-    },
-    yaxis: {
-      labels: {
-        formatter: function (val) {
-          return val.toFixed(3);
-        },
-      },
-      lines: {
-        show: true,
-      },
-      title: {
-        text: 'Densité de photons'
-      },
-    },
-    xaxis: {
-      type: 'numeric',
-      min : 50, 
-      max : 10000,
-      lines: {
-        show: true,
-      },
-      title: {
-        text: 'Energie (keV)'
-      },
-    },
-    tooltip: {
-      shared: false,
-      y: {
-        formatter: function (val) {
-          return val.toFixed(3);
-        }
-      }
-    }, 
-    responsive : [
-      {
-        breakpoint: 600,
-        options: {
-            title: {
-              text: 'Energie',
-              align: 'left'
-            },
-            yaxis: {  
-              title : {text : "Densité",},
-              labels: {
-                formatter: function (val) {
-                  return val.toFixed(3);
-                },},
-            }, 
-            xaxis: {
-              min : 50, 
-              max : 3000,
-            },
-            toolbar: {
-              show : true, 
-              autoSelected: 'zoom',
-
-               
-            }, 
-            tooltip: {
-              style: {
-                fontSize: '8px',
-              },
-              x: {
-                show: false,},
-            }, 
-
-            
-        }
-      }
-    
-    ]
-  }
-
-  
 
   return(
 
@@ -374,17 +298,44 @@ const Energy2 = (props) => {
         </Grid>
         </Grid>
       </Grid> 
+      {loadingData &&
+     <Typography variant = 'h4'>Chargement des données</Typography>
+    }
+      {!loadingData &&
       <Grid container justify = 'center' alignItems = 'center' >
-
+      
      <Grid item xs = {12} sm = {9}>
      <Box margin = '1.5em' color = 'white'>
       </Box>
-     <ReactApexChart options={options}
-              series={series}
-              />
+      <EnergyViewer data = {[spectrumData1, spectrumData2]} name = {name}/>
+      </Grid>
+
+      <Grid item xs = {12} sm = {9}>
+     <Box margin = '1.5em' color = 'white'>
+      </Box>
+      <EnergyViewer data = {[dataDiff]} name = {nameDiff}/>
+      </Grid>
+
+      <Grid item xs = {12} sm = {9}>
+
+      <FormControlLabel
+        control={
+          <Switch
+            checked={switchState}
+            onChange={handleChangeSwitch}
+            name="checked"
+            color="primary"
+          />
+        }
+        label="Echelle logarithmique"
+      />
+
+      </Grid>
+
       </Grid>
       
-      </Grid>
+      }
+      
       </Grid>
       </Grid>
     </Grid> 

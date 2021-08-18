@@ -9,15 +9,17 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
 
-import {Grid, Container, Button, Paper, Box, Typography} from '@material-ui/core';
+import {Grid, Container, Button, Paper, Box, Typography, Switch, FormGroup, FormControlLabel} from '@material-ui/core';
 import csvjson from 'csvjson'
 
 import dataDetector from '../../resources/data/data_detector.json';
+import Help from '../Help/help'
 
 
 /**
 * @author
 * @function Energy
+* Permet d'afficher le graphique du spectre en énergie pour un détecteur (chargement des données réalisé au préalable et donné en props)
 **/
 
 
@@ -32,12 +34,35 @@ const Energy = (props) => {
     // Décalage horaire de 2 heures à prendre en compte 
     const [spectrumTimeValue, setSpectrumTimeValue] = useState([new Date(installation_date),new Date(dataLean[0][1] - 2*3600*1000)]);
     const [spectrumData, setSpectrumData] = useState([]);
-
-
+    const [loadingData, setLoadingData] = useState(false)
+    const [switchState, setSwitchState] = useState(false);
+  
+    const handleChangeSwitch = (event) => {
+      setLoadingData(true)
+      console.log(switchState)
+      setSwitchState(event.target.checked)
+    };
 
   useEffect(() => {
-    if (dataLean.length > 0) { setSpectrum(dataLean) }
+    if (switchState) {
+      switchToLogarithmData(spectrumData).then((data) => {
+          setSpectrumData(data)
+        })}
+    else {
+        setSpectrum(dataLean)
+      }
+  setLoadingData(false)
+  }
+  ,[switchState])
+
+  useEffect(() => {
+    if (dataLean.length > 0) { 
+      setSpectrum(dataLean) 
+      setSwitchState(false)
+    }
   },[spectrumTimeValue]);
+
+
 
 
 
@@ -45,6 +70,7 @@ const Energy = (props) => {
     if (dataLean.length > 0) {
       // Décalage horaire de 2 heures à prendre en compte 
       setSpectrumTimeValue([new Date(installation_date),new Date(dataLean[0][1]- 2*3600*1000)])
+      setSwitchState(false)
     }
   },[dataLean])
 
@@ -89,6 +115,8 @@ const Energy = (props) => {
     for (var j = 0; j<densities.length;j++) {
       densities[j] /= total_density
     }
+
+
     return [energies,densities]
   };
 
@@ -101,12 +129,17 @@ const Energy = (props) => {
   } 
 
 
-  const diff_date_in_hour = (date1,date2) => {
-    var diff_time = date2.getTime()-date1.getTime()
-    return diff_time / (1000 * 3600);
+  async function switchToLogarithmData(data) {
+      let logData = data
+      for (let key in logData) {
+        let y = logData[key].y;
+        y = Math.log(y)
+        logData[key].y = y
+      }
+      return Promise.resolve(logData)
   }
 
- 
+
 
   const downloadAsJsonFile = (data, filename) => {
     // -------------- Transform data into json and download file ------------------
@@ -161,30 +194,25 @@ const Energy = (props) => {
     a.dispatchEvent(e)
   }
 
-  const CustomizedDot = (props) => {
-    const { cx, cy, stroke, payload, value } = props;
-  
-    if (cx % 10 == 0) {
-      return (
-        <svg x={cx - 10} y={cy - 10} width={20} height={20} fill="red" viewBox="0 0 1024 1024">
-        </svg>
-      );
-    }
-  
-  };
+
+
 
 
 
   var series = [{
     name: 'densité',
+    type: 'area',
     data: spectrumData
   }]
 
   const options = {
     chart: {
-      type: 'line',
+      type: 'area',
       stacked: false,
       width: '100%',
+      animations : {
+        enabled : false,
+      },
       zoom: {
         type: 'x',
         enabled: true,
@@ -305,12 +333,14 @@ const Energy = (props) => {
 
     <Grid container spacing={3}>
     <Grid item xs={12}>
+    <Help page = 'Energy'/>
       <Grid container className="spectrum-container">
         <Grid item xs={12}>
-          <h4 classname = 'title' style={{marginTop:"20px", marginBottom : "20px"}}>Spectre en énergie</h4>
+          <h4 classname = 'title' style={{marginTop:"10px", marginBottom : "20px"}}>Spectre en énergie</h4>
         </Grid>  
         <Grid container justify = 'center' spacing = {3} className="periode-container">
          <Grid item xs = {10}>
+          
           <Grid container>
             <Grid item xs={12}>
               <h6 style={{marginBottom:"10px",marginTop:"50px"}}>Période</h6>
@@ -354,9 +384,29 @@ const Energy = (props) => {
      <Grid item xs = {12} sm = {9}>
      <Box margin = '1.5em' color = 'white'>
       </Box>
+    {loadingData &&
+     <Typography variant = 'h4'>Chargement des données</Typography>
+    }
+    {!loadingData &&
      <ReactApexChart options={options}
               series={series}
               />
+    }
+      </Grid>
+      <Grid item xs = {12} sm = {9}>
+
+      <FormControlLabel
+        control={
+          <Switch
+            checked={switchState}
+            onChange={handleChangeSwitch}
+            name="checked"
+            color="primary"
+          />
+        }
+        label="Echelle logarithmique"
+      />
+ 
       </Grid>
       
       </Grid>

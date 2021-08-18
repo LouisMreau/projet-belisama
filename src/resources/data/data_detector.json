@@ -3,6 +3,8 @@
         "name": "Observatoire de Meudon",
         "id" : "obsmeudon",
         "place": "Observatoire de Meudon, Meudon",
+        "city" : "Meudon",
+        "weatherURL" : "https://forecast7.com/fr/48d812d24/meudon/",
         "contact": "",
         "installation_date": "2021-06-24",
         "position" : [48.80496, 2.23108]
@@ -11,13 +13,17 @@
         "name": "Lycée Corneille",
         "id" : "LCSC",
         "place": "Lycée Corneille, La Celle Saint Cloud",
-        "contact": "Caroline Ladent, carolineladent@exemple.com",
+        "city" : "La Celle-Saint-Cloud",
+        "weatherURL" : "https://forecast7.com/fr/48d852d13/la-celle-saint-cloud/",
+        "contact": "",
         "installation_date": "2021-05-13",
         "position" : [48.8461, 2.13648]
     },
     {
         "name": "Lycée Marie Curie",
         "id" : "MCSceaux",
+        "city" : "Sceaux",
+        "weatherURL" : "https://forecast7.com/fr/48d782d30/sceaux/",
         "place": "Lycée Marie Curie, Sceaux",
         "contact": "",
         "installation_date": "2021-07-12",

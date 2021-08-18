@@ -8,6 +8,7 @@ import { Button } from 'react-bootstrap';
 /**
 * @author
 * @function NavMain
+* Renvoie la navbar responsive
 **/
 
 const NavMain = (props) => {
@@ -15,7 +16,7 @@ const NavMain = (props) => {
   
   return(
   
-      <Navbar  bg="white" variant="light" expand="lg">
+      <Navbar bg="white" variant="light" expand="lg" >
         <Navbar.Brand href='/'>
         <Nav.Link href="/"> <img className = 'logo' src={Logo} /></Nav.Link>
         </Navbar.Brand>
@@ -24,8 +25,10 @@ const NavMain = (props) => {
         <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
                 <Nav.Link href="/map" class="nav-cat">Carte</Nav.Link>
-                <Nav.Link href="/contact" className="nav-cat">Contact</Nav.Link>
-                <Nav.Link href="/comparaison" className="nav-cat">Comparaison</Nav.Link>
+                <Nav.Link href="/analysis" className="nav-cat">Analyse</Nav.Link>
+                <Nav.Link href="/about" className="nav-cat">A propos</Nav.Link>
+                {/* <Nav.Link href="/contact" className="nav-cat">Contact</Nav.Link> */}
+                
 
             </Nav>
 

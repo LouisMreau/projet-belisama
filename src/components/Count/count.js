@@ -14,11 +14,14 @@ import { withStyles, makeStyles } from '@material-ui/core/styles';
 import csvjson from 'csvjson'
 
 import dataDetector from '../../resources/data/data_detector.json';
+import Help from '../Help/help'
+
 
 
 /**
 * @author
 * @function Count
+* Permet d'afficher le graphique de taux de comptage pour un détecteur (chargement des données réalisé au préalable et donné en props)
 **/
 
 
@@ -32,27 +35,20 @@ const Count = (props) => {
   var dataLean = props.dataLean;
   const [countSliderValue, setCountSliderValue] = useState([dataLean[0][2], dataLean[0][2]+7000]);
   // Décalage horaire de 2 heures à prendre en compte 
-  const [countTimeValue, setCountTimeValue] = useState([new Date(installation_date),new Date(dataLean[0][1]- 2*3600*1000)]);
+  const [countTimeValue, setCountTimeValue] = useState([new Date(installation_date),new Date(dataLean[0][1]-2*3600*1000)]);
   const [countData, setCountData] = useState([]);
-  const isLoadinData = props.isLoadinData; 
-  const loadingMessage = props.loadingMessage;
-
-
 
   useEffect(() => {
     if (dataLean.length > 0) 
-    { setCountSerie(dataLean) }
-  },[countTimeValue,countSliderValue]);
-
+      setCountSerie(dataLean) 
+    },[countTimeValue,countSliderValue]);
 
   useEffect(() => {
     if (dataLean.length > 0) {
       setCountSliderValue([dataLean[0][2], dataLean[0][2]+7000])
       // Décalage horaire de 2 heures à prendre en compte 
-      setCountTimeValue([new Date(installation_date),new Date(dataLean[0][1]- 2*3600*1000)])
-    }
-  }
-  ,[props.dataLean]
+      setCountTimeValue([new Date(installation_date),new Date(dataLean[0][1]-2*3600*1000)])
+    }},[props.dataLean]
   )
 
 
@@ -65,8 +61,6 @@ const Count = (props) => {
     else { setCountTimeValue([newValue,countTimeValue[1]]); }
   };
 
-
-
   const createChartData = (xx,yy) => {
     let chartData = []
     for (var i = 0; i<yy.length; i++) {
@@ -78,10 +72,9 @@ const Count = (props) => {
   const loadCountSerie = (dataLean, inf_energy,sup_energy, inf_time, sup_time) => {
     let counts = []
     let times = []
-    for (var i = inf_time; i<sup_time;i++) {
+    for (var i = inf_time; i<=sup_time;i++) {
       counts.push(dataLean[1][i].slice(inf_energy,sup_energy).reduce((a, b) => a + b, 0))
       times.push(new Date(i*3600*1000 + dataLean[0][0]))
-      
     }
     return [times,counts]
   }
@@ -89,8 +82,8 @@ const Count = (props) => {
   const setCountSerie = (dataLean) => {
     let start_energy  = Math.trunc((countSliderValue[0]-dataLean[0][2])/dataLean[0][3])
     let end_energy = Math.trunc((countSliderValue[1]-dataLean[0][2])/dataLean[0][3])
-    let start_time = (countTimeValue[0].getTime()-dataLean[0][0])/1000/3600
-    let end_time = Math.trunc((countTimeValue[1].getTime()-dataLean[0][0])/1000/3600)
+    let start_time = (countTimeValue[0]-dataLean[0][0])/1000/3600
+    let end_time = Math.trunc((countTimeValue[1]-dataLean[0][0])/1000/3600)
     let data = loadCountSerie(dataLean,start_energy, end_energy,start_time,end_time)
     data = createChartData(data[0],data[1])
     setCountData(data)
@@ -137,6 +130,9 @@ const Count = (props) => {
       type: 'line',
       stacked: false,
       width: '100%',
+      animations : {
+        enabled : false,
+      },
       zoom: {
         type: 'x',
         enabled: true,
@@ -158,7 +154,7 @@ const Count = (props) => {
             columnDelimiter: ';',
             headerCategory: 'Date',
             headerValue: 'Nombre de photons par heure',
-            dateFormatter : function(x) {return x.toLocaleString();},
+            dateFormatter : function(x) {return moment(x).format('YYYY-MM-DD HH:m');},
           },
           svg: {
             filename: "comptage_"+ detectorId,
@@ -186,7 +182,6 @@ const Count = (props) => {
       text: 'Taux de comptage',
       align: 'left'
     },
-
     yaxis: {
       labels: {
         formatter: function (val) {
@@ -204,6 +199,7 @@ const Count = (props) => {
       type: 'datetime',
       labels: {
         format: 'dd/MM/yyyy, HH:mm',
+        datetimeUTC: false,
       },
       lines: {
         show: true,
@@ -223,112 +219,93 @@ const Count = (props) => {
         format: "dd/MM/yyyy, HH:mm",
       },
     },
-    responsive: [
-      {
-        breakpoint: 600,
-        options: {
-            title: {
-              text: 'Comptage',
-              align: 'left'
-            },
-            yaxis: {
-              show : true,  
-              tickAmount : 3,
-            }, 
-            toolbar: {
-              show : false, 
+    responsive: [{
+      breakpoint: 600,
+      options: {
+          title: {
+            text: 'Comptage',
+            align: 'left'
+          },
+          yaxis: {
+            show : true,  
+            tickAmount : 3,
+          }, 
+          toolbar: {
+            show : false, 
 
-            },  
-            tooltip: {
-              style: {
-                fontSize: '8px',
-              },
-              x: {
-                show: false,},
-              y: {
-                  title: {
-                      formatter: (seriesName) => "Photons par heure",
-                  },
-              },
+          },  
+          tooltip: {
+            style: {
+              fontSize: '8px',
             },
-
-            
+            x: {
+              show: false,},
+            y: {
+                title: {
+                    formatter: (seriesName) => "Photons par heure",
+                },
+            },
+          },   
         }
       }
     ]
   }
 
 
-  
-
   return(
-
-      <Grid container spacing={3}>
+    <Grid container spacing={3} justify = 'center'>
       <Grid item xs={12}>
+        <Help page = 'Count'/>
         <Grid container className="count-container">
           <Grid item xs={12}>
-            <h4 classname = 'title' style={{marginTop : "20px", marginBottom: "20px"}}>Taux de comptage temporel</h4>
+            <h4 classname = 'title' style={{ marginBottom: "20px"}}>Taux de comptage temporel</h4>
           </Grid>
-          
           <Grid container justify = 'center' spacing = {3} className="periode-container">
-            <Grid item xs = {10}>
+            <Grid item xs = {12}>
               <Grid container>
-            <Grid item xs={12}>
-              <h6 style={{marginBottom:"10px", marginTop:"50px"}}>Période</h6>
-            </Grid>
-            <Grid item xs={12} sm = {6}>
-              <p style={{marginRight:"20px", marginLeft:"20px", marginTop : '20px'}}>Début</p>
-              <DatePicker minDate={new Date(installation_date)} maxDate={countTimeValue[1]} dateFormat="dd/MM/yyyy" selected={countTimeValue[0]} onChange={date => handleCountTimeChange(false,date)} />
-            </Grid>
-            <Grid item xs={12} sm = {6}> 
-              <p style={{marginLeft:"20px",marginRight:"20px", marginTop : '20px'}}>Fin</p>
-              <DatePicker minDate={countTimeValue[0]} maxDate={new Date(dataLean[0][1]- 2*3600*1000)} dateFormat="dd/MM/yyyy" selected={countTimeValue[1]} onChange={date => handleCountTimeChange(true,date)} />
-            </Grid>
-            </Grid>
+                <Grid item xs={12}>
+                  <h6 style={{marginBottom:"10px", marginTop:"50px"}}>Période</h6>
+                </Grid>
+                <Grid item xs={12} sm = {6}>
+                  <p style={{marginRight:"20px", marginLeft:"20px", marginTop : '20px'}}>Début</p>
+                  <DatePicker minDate={new Date(installation_date)} maxDate={new Date(dataLean[0][1]- 2*3600*1000)} dateFormat="dd/MM/yyyy" selected={countTimeValue[0]} onChange={date => handleCountTimeChange(false,date)} />
+                </Grid>
+                <Grid item xs={12} sm = {6}> 
+                  <p style={{marginLeft:"20px",marginRight:"20px", marginTop : '20px'}}>Fin</p>
+                  <DatePicker minDate={countTimeValue[0]} maxDate={new Date(dataLean[0][1]-2*1000*3600)} dateFormat="dd/MM/yyyy" selected={countTimeValue[1]} onChange={date => handleCountTimeChange(true,date)} />
+                </Grid>
+              </Grid>
             </Grid>
           </Grid> 
 
           <Grid container justify = 'center' alignItems = 'center' >
-          <Grid item xs={12}>
-            <h6 style={{marginBottom:"20px", marginTop:"50px"}}>Gamme d'énergie</h6>
-          </Grid>
-         
-          <Grid item xs={9} >
-            <Slider
-            min={dataLean[0][2]}
-            max={dataLean[0][2]+dataLean[0][3]*dataLean[0][4]}
-            step={dataLean[0][3]}
-            value={countSliderValue}
-            onChange={handleCountSliderChange}
-            valueLabelDisplay="auto"
-            aria-labelledby="range-slider"
-            marks={[{value:dataLean[0][2],label:dataLean[0][2].toString()+" keV"},{value:dataLean[0][2]+dataLean[0][3]*dataLean[0][4],label:(dataLean[0][2]+dataLean[0][3]*dataLean[0][4]).toString()+" keV"}]}
-            />
-          
-          </Grid>
+            <Grid item xs={12}>
+              <h6 style={{marginBottom:"20px", marginTop:"50px"}}>Gamme d'énergie</h6>
+            </Grid>
+            <Grid item xs={9}>
+              <Slider
+                min={dataLean[0][2]}
+                max={dataLean[0][2]+dataLean[0][3]*dataLean[0][4]}
+                step={dataLean[0][3]}
+                value={countSliderValue}
+                onChange={handleCountSliderChange}
+                valueLabelDisplay="auto"
+                aria-labelledby="range-slider"
+                marks={[{value:dataLean[0][2],label:dataLean[0][2].toString()+" keV"},{value:dataLean[0][2]+dataLean[0][3]*dataLean[0][4],label:(dataLean[0][2]+dataLean[0][3]*dataLean[0][4]).toString()+" keV"}]}
+              />
+            </Grid>
 
-          <Grid item xs={12} sm = {9}>
-          <Box margin = '2em' color = 'white'>
-            </Box>
-           
-          <Chart options={options}
-                    series={series}
-                    />
-         </Grid> 
-         <Grid  xs={12} sm = {9}>  
-         <Box margin = '2em' color = 'white'>
-            </Box>
-          
-          </Grid> 
+            <Grid item xs={12} sm = {9}>
+              <Box margin = '2em' color = 'white'></Box>
+              <Chart options={options} series={series} />
+            </Grid> 
+            <Grid  xs={12} sm = {9}>  
+              <Box margin = '2em' color = 'white'></Box>
+            </Grid> 
           </Grid>
-        </Grid>
         </Grid>
       </Grid>
-      
-      
-
-      )
-
- }
+    </Grid>
+  )}
 
 export default Count

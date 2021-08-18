@@ -7,14 +7,18 @@ import {Grid, Container, Button, Paper, Box, Typography, CircularProgress} from 
 import JSZip from 'jszip';
 import JSZipUtils from 'jszip-utils'
 import FileSaver from 'file-saver';
+import urlExist from "url-exist";
 
 
 import dataDetector from '../../resources/data/data_detector.json';
+import Help from '../Help/help'
 
 
 /**
 * @author
 * @function Download
+* Permet le téléchargement des données brutes, traitées selon certaines périodes (téléchargement par jour ou par mois selon ancienneté)
+* Le téléchargement se fait par l'utilisation d'un URL dont l'intitulé diffère selon la date d'envoi des données
 **/
 
 
@@ -39,7 +43,7 @@ const Download = (props) => {
   yesterday.setHours(today.getHours() - 5)
   const firstDayofMonth = (date) => {
     var firstDay = new Date()
-    if ((date.getDate() === 1) && (date.getHours() < 5)){
+    if ((date.getDate() === 1) && (date.getHours() < 9)){
       firstDay.setMonth(date.getMonth() - 1)
     }
     firstDay.setDate(1)
@@ -59,9 +63,6 @@ const Download = (props) => {
   useEffect(() => {
       if (props.dataLean.length > 0) {
         setDownloadRawTimeValue([yesterday,yesterday])
-      // if (firstDayofMonth(new Date(installation_date)) <= oneMonthAgo(today)){
-      //   setDownloadRawMonthValue(oneMonthAgo(today))
-      // }
       }
     },[props.dataLean])
 
@@ -138,12 +139,9 @@ const Download = (props) => {
 
 
 
-  
-
-
   const zipMultipleFiles = (fileList, fileName) => {
     // ----------------------- Telechargement et zip -----------------------
-    var zip = new JSZip();  
+    var zip = new JSZip();
     fileList.map((item, index) => {
       zip.file(fileNaming(item), urlToPromise(item), {binary:true});
     })
@@ -153,7 +151,7 @@ const Download = (props) => {
             setIsDownloadingData(false)
             setIsDownloadingMonthData(false)
           })
-        }
+    }
 
 
 
@@ -182,7 +180,6 @@ const Download = (props) => {
       })}
 
   async function downloadMultipleDayData(startDate, endDate, detector_id) {
-
     var table = [];
     var download_day = new Date(startDate)
     while(download_day <= endDate){   
@@ -204,12 +201,27 @@ const Download = (props) => {
     return (date1 > date2 ? date1 : date2)
   }
 
+  const checkExistenceUrl = async (url) => {
+    let answer = await urlExist(url)
+    return answer
+  }
+
+  const checkMultipleUrl = (urlList) => {
+      var multipleAnswers = []
+      urlList.map((url) => {
+          checkExistenceUrl(url).then((answer) => {multipleAnswers.push(answer)})
+      })
+      return !multipleAnswers.every(e => e == false)
+  }
+
 
 
 
     return (
-
-
+      <Grid>
+      <Help page = 'Download'/>
+            <Container maxWidth="md">
+              
               <Grid container justify = 'center' alignItems = 'center' className="download-container">
               <Grid item xs={12}>
                 <Grid item xs={12}>
@@ -318,6 +330,8 @@ const Download = (props) => {
 
                 </Grid>
                 </Grid>
+              </Grid>
+              </Container>
               </Grid>
 
 

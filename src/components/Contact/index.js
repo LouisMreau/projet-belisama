@@ -4,12 +4,13 @@ import './style.css'
 /**
 * @author
 * @function Contact
+* Donne les contacts ayant contribué au projet Belisama
 **/
 
 const Contact = (props) => {
   return(
     <div  >
-       <h2 style={{color:"white",marginBottom:"20px"}}> Caractéristiques du Palmier </h2>
+
        <div className="team-container">
         <div className="desc-container">
         <p style={{fontWeight: "bold"}}>Philippe Laurent - Chef de Projet</p>  
