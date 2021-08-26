@@ -75,6 +75,10 @@ export default function CountViewer(props) {
     dataLabels: {
       enabled: false
     },
+    legend: {
+      show: true,
+      showForSingleSeries: true,
+    },
     markers: {
       size: 0,
     },

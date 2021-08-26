@@ -13,7 +13,6 @@ import {Grid, Container, Button, Paper, Box, Typography} from '@material-ui/core
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import csvjson from 'csvjson'
 
-import dataDetector from '../../resources/data/data_detector.json';
 import ChartPeriod from '../Chart/ChartCPeriod'
 
 
@@ -29,6 +28,7 @@ import ChartPeriod from '../Chart/ChartCPeriod'
 const CountPeriod = (props) => {
   var detectorId  = props.detectorId;
   var dataLean = props.dataLean;
+  const dataDetector = props.dataDetector;
 
   var installation_date = dataDetector.filter(function (detector) {
     return (detector.id == detectorId);

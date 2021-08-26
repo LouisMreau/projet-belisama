@@ -7,9 +7,8 @@ import Contact from './components/Contact/index'
 import DetectorMap from './components/DetectorMap/index'
 import Comparaison from './components/Comparaison/index'
 import MoreInfo from './components/MoreInfo/moreinfo'
-import Videos from './components/Videos/videos'
+import DisplayVideos from './components/Videos/displayVideos'
 import OpenWeather from './components/Weather/openWeatherWidget'
-import Test from './components/Test/test'
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter as Router,Switch,Route,Link,Redirect } from "react-router-dom";
@@ -34,7 +33,7 @@ function App() {
             <MoreInfo />
         </Route>
         <Route path="/videos">
-            <Videos/>
+            <DisplayVideos/>
         </Route>
         <Route path="/analysis">
           <Comparaison/>
@@ -44,9 +43,6 @@ function App() {
         </Route>
         <Route path="/weather">
           <OpenWeather />
-        </Route>
-        <Route path = "/test">
-          <Test/>
         </Route>
         <Route path="/data/:detectorId" component={DataVisu} />
         <Route path="/data">

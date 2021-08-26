@@ -10,7 +10,6 @@ import {Grid, Container, Button, Paper, Box, Typography, Link, Breadcrumbs, Circ
 import DatePicker from "react-datepicker";
 import axios from 'axios';
 
-import dataDetector from '../../resources/data/data_detector.json';
 import CountPeriod from '../Count/countPeriod';
 import SpectrumPeriod from '../Energy/spectrumPeriod'
 
@@ -22,6 +21,7 @@ import SpectrumPeriod from '../Energy/spectrumPeriod'
 
 const ComparePeriod = (props) => {
     const [dataLean, setDataLean] = useState([]);
+    const dataDetector = props.dataDetector
     const [detectorId, setDetectorId] = useState('');
     const [installation_date, setInstallationDate] = useState([new Date()])
     const [startDate1, setStartDate1] = useState(new Date());
@@ -35,8 +35,9 @@ const ComparePeriod = (props) => {
         loadData(detectorId)
     }, [detectorId])
 
+
     useEffect(() => {
-        if (dataLean.length > 0) {
+        if ((dataLean.length > 0) && (dataDetector.length > 0)) {
             setShowGraph(true)
         }
     }, [dataLean])
@@ -133,10 +134,10 @@ const ComparePeriod = (props) => {
                 </Grid>
                 )}
                 {(showGraph) && (type == "count") && (
-                <CountPeriod detectorId = {detectorId} dataLean = {dataLean}/>  
+                <CountPeriod detectorId = {detectorId} dataLean = {dataLean} dataDetector = {dataDetector} />  
                 )}
                 {(showGraph) && (type == "spectrum") && (
-                <SpectrumPeriod detectorId = {detectorId} dataLean = {dataLean}/>  
+                <SpectrumPeriod detectorId = {detectorId} dataLean = {dataLean} dataDetector = {dataDetector} />  
                 )}
                     
                 </Grid>

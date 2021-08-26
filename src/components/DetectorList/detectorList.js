@@ -1,7 +1,7 @@
 import {React, Fragment} from 'react';
 import PropTypes from 'prop-types';
 import {Grid} from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -13,7 +13,9 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import DoubleArrowIcon from '@material-ui/icons/DoubleArrow';
-import dataDetector from '../../resources/data/data_detector.json';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import green from '@material-ui/core/colors/green'
+import red from '@material-ui/core/colors/red'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -28,6 +30,44 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
+const BootstrapButton = withStyles({
+  root: {
+    boxShadow: 'none',
+    textTransform: 'none',
+    fontSize: 14,
+    padding: '4px 12px',
+    border: '1px solid',
+    lineHeight: 1.5,
+    // backgroundColor: '#09476e',
+    borderColor: 'black',
+    fontFamily: [
+      // '-apple-system',
+      // 'BlinkMacSystemFont',
+      // '"Segoe UI"',
+      // 'Roboto',
+      // '"Helvetica Neue"',
+      'Arial',
+      // 'sans-serif',
+      // '"Apple Color Emoji"',
+      // '"Segoe UI Emoji"',
+      // '"Segoe UI Symbol"',
+    ].join(','),
+    '&:hover': {
+      backgroundColor: '#dcdcdc',
+      borderColor: 'black',
+      boxShadow: 'none',
+    },
+    '&:active': {
+      boxShadow: 'none',
+      backgroundColor: '#dcdcdc',
+      borderColor: '#0062cc',
+    },
+    '&:focus': {
+      boxShadow: '0 0 0 0.2rem rgb(256, 256, 256)',
+    },
+  },
+})(Button);
+
 /**
 * @author
 * @function DetectorList
@@ -36,15 +76,16 @@ const useStyles = makeStyles((theme) => ({
 **/
 
 
-export default function DetectorList() {
+export default function DetectorList(props) {
   const classes = useStyles();
-
+  const dataDetector = props.dataDetector
 
   return (
     <Grid item xs = {12} sm = {4}>
         <List className={classes.root}>
     
         {dataDetector.map((detector) => (
+          <div>
           <ListItem alignItems="flex-start">
           <ListItemText
           primary={detector.place}
@@ -69,17 +110,33 @@ export default function DetectorList() {
                 {"Date d'installation : "} 
               </Typography>
               {detector.installation_date}
+              <br/>
+              <Typography
+                component="span"
+                variant="body2"
+                className={classes.inline}
+                color="textPrimary"
+              >
+                {"Statut : "} 
+              </Typography>
+              {detector.breakdown && (
+              <FiberManualRecordIcon fontSize = 'small' style = {{color : "red"}}/>
+              )}
+              {!detector.breakdown && (
+              <FiberManualRecordIcon fontSize = 'small' style = {{color : "green"}}/>
+              )}
               <Box margin = '0.5em'></Box>
-              <Button className={classes.inline} variant="outlined" startIcon={<DoubleArrowIcon />} href = {"/data/" + detector.id} style={{marginTop:"20px"}}>Voir les données</Button>
+              <BootstrapButton className={classes.inline} variant="outlined" startIcon={<DoubleArrowIcon />} href = {"/data/" + detector.id} style={{marginTop:"20px"}}>Voir les données</BootstrapButton>
               
             </Fragment>
             
           }/>
          
-          {/* <Divider variant = 'inset' component ='li' /> */}
+          
           
         </ListItem>
-        
+        <Divider variant="middle" />
+        </div>
         ))}
         
       </List>

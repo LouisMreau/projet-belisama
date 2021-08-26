@@ -9,12 +9,13 @@ import { getDefaultNormalizer } from '@testing-library/dom';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import {Grid, Container, Button, Paper, Box, Typography} from '@material-ui/core';
+import {Grid, Container, Button, Paper, Box, Typography, Breadcrumbs} from '@material-ui/core';
+import CloudIcon from '@material-ui/icons/Cloud';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import csvjson from 'csvjson'
 
-import dataDetector from '../../resources/data/data_detector.json';
 import Help from '../Help/help'
+import OpenWeatherWidget from '../Weather/openWeatherWidget';
 
 
 
@@ -28,15 +29,27 @@ import Help from '../Help/help'
 
 const Count = (props) => {
   const detectorId  = props.detectorId;
+  const dataDetector = props.dataDetector
   var installation_date = dataDetector.filter(function (detector) {
     return (detector.id == detectorId);
     })[0].installation_date
   installation_date = installation_date + 'T00:00:00'
+
+  var city = dataDetector.filter(function (detector) {
+    return (detector.id == detectorId);
+    })[0].city
+
+  var weatherURL = dataDetector.filter(function (detector) {
+    return (detector.id == detectorId);
+    })[0].weatherURL
+
   var dataLean = props.dataLean;
   const [countSliderValue, setCountSliderValue] = useState([dataLean[0][2], dataLean[0][2]+7000]);
   // Décalage horaire de 2 heures à prendre en compte 
   const [countTimeValue, setCountTimeValue] = useState([new Date(installation_date),new Date(dataLean[0][1]-2*3600*1000)]);
   const [countData, setCountData] = useState([]);
+  const [showWeather, setShowWeather] = useState(false)
+  const [color, setColor] = useState("primary")
 
   useEffect(() => {
     if (dataLean.length > 0) 
@@ -60,6 +73,20 @@ const Count = (props) => {
     if (isEndTime) { setCountTimeValue([countTimeValue[0],newValue]); }
     else { setCountTimeValue([newValue,countTimeValue[1]]); }
   };
+
+
+  function handleWeather() {
+    var x = document.getElementById("weather");
+    if (!showWeather) {
+        x.style.display = "block";
+        setColor("active")
+        setShowWeather(true)
+    } else {
+        x.style.display = "none";
+        setShowWeather(false)
+        setColor("primary")
+    }
+    }
 
   const createChartData = (xx,yy) => {
     let chartData = []
@@ -251,14 +278,32 @@ const Count = (props) => {
     ]
   }
 
-
   return(
     <Grid container spacing={3} justify = 'center'>
+      <Grid item xs = {12}>
+        <Breadcrumbs aria-label="breadcrumb">
+            <Typography color="inherit">{city}</Typography>
+            <Typography color="textPrimary">Comptage</Typography>
+        </Breadcrumbs>
+        </Grid>
       <Grid item xs={12}>
-        <Help page = 'Count'/>
+        <Grid id = "weather" style = {{display : 'none'}}>
+        <OpenWeatherWidget  city = {city} weatherURL = {weatherURL}/>
+        </Grid>
+        <Grid container direction = 'row-reverse'>
+          <Grid>
+          <Help page = 'Count'/>
+          </Grid>
+          <Grid>
+          <Box margin = '1em'></Box>
+          </Grid>
+          <Grid>
+          <Button variant="outlined" color={color} startIcon={<CloudIcon />} onClick={() => {handleWeather()}}>Météo</Button>
+          </Grid>
+        </Grid>
         <Grid container className="count-container">
           <Grid item xs={12}>
-            <h4 classname = 'title' style={{ marginBottom: "20px"}}>Taux de comptage temporel</h4>
+            <h4 classname = 'title' style={{ marginTop : "-30px", marginBottom: "20px"}}>Taux de comptage temporel</h4>
           </Grid>
           <Grid container justify = 'center' spacing = {3} className="periode-container">
             <Grid item xs = {12}>

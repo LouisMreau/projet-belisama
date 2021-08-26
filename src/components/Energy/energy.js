@@ -9,11 +9,13 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios';
 
-import {Grid, Container, Button, Paper, Box, Typography, Switch, FormGroup, FormControlLabel} from '@material-ui/core';
+import {Grid, Container, Button, Paper, Box, Typography, Switch, FormGroup, FormControlLabel, Breadcrumbs} from '@material-ui/core';
+import CloudIcon from '@material-ui/icons/Cloud';
 import csvjson from 'csvjson'
 
-import dataDetector from '../../resources/data/data_detector.json';
+
 import Help from '../Help/help'
+import OpenWeatherWidget from '../Weather/openWeatherWidget';
 
 
 /**
@@ -27,15 +29,27 @@ import Help from '../Help/help'
 const Energy = (props) => {
     const detectorId  = props.detectorId;
     const dataLean = props.dataLean;
+    const dataDetector = props.dataDetector;
     var installation_date = dataDetector.filter(function (detector) {
       return (detector.id == detectorId);
       })[0].installation_date
     installation_date = installation_date + 'T00:00:00'
+
+    var city = dataDetector.filter(function (detector) {
+      return (detector.id == detectorId);
+      })[0].city
+  
+    var weatherURL = dataDetector.filter(function (detector) {
+      return (detector.id == detectorId);
+      })[0].weatherURL
+
     // Décalage horaire de 2 heures à prendre en compte 
     const [spectrumTimeValue, setSpectrumTimeValue] = useState([new Date(installation_date),new Date(dataLean[0][1] - 2*3600*1000)]);
     const [spectrumData, setSpectrumData] = useState([]);
     const [loadingData, setLoadingData] = useState(false)
     const [switchState, setSwitchState] = useState(false);
+    const [showWeather, setShowWeather] = useState(false)
+    const [color, setColor] = useState("primary")
   
     const handleChangeSwitch = (event) => {
       setLoadingData(true)
@@ -83,6 +97,20 @@ const Energy = (props) => {
     if (isEndTime) { setSpectrumTimeValue([spectrumTimeValue[0],newValue]); }
     else { setSpectrumTimeValue([newValue,spectrumTimeValue[1]]); }
   };
+
+  function handleWeather() {
+    var x = document.getElementById("weather");
+    console.log(x)
+    if (showWeather) {
+        x.style.display = "block";
+        setColor("primary")
+        setShowWeather(false)
+    } else {
+        x.style.display = "none";
+        setShowWeather(true)
+        setColor("active")
+    }
+    }
 
 
   const createChartData = (xx,yy) => {
@@ -332,11 +360,27 @@ const Energy = (props) => {
 
 
     <Grid container spacing={3}>
+      <Grid item xs = {12}>
+        <Breadcrumbs aria-label="breadcrumb">
+            <Typography color="inherit">{city}</Typography>
+            <Typography color="textPrimary">Energie</Typography>
+        </Breadcrumbs>
+        </Grid>
     <Grid item xs={12}>
-    <Help page = 'Energy'/>
+        <Grid container direction = 'row-reverse'>
+          <Grid>
+          <Help page = 'Energy'/>
+          </Grid>
+          {/* <Grid> */}
+          {/* <Box margin = '1em'></Box> */}
+          {/* </Grid> */}
+          {/* <Grid> */}
+          {/* <Button variant="outlined" color={color} startIcon={<CloudIcon />} onClick={() => {handleWeather()}}>Météo</Button> */}
+          {/* </Grid> */}
+        </Grid>
       <Grid container className="spectrum-container">
         <Grid item xs={12}>
-          <h4 classname = 'title' style={{marginTop:"10px", marginBottom : "20px"}}>Spectre en énergie</h4>
+          <h4 classname = 'title' style={{marginTop : "-30px", marginBottom : "20px"}}>Spectre en énergie</h4>
         </Grid>  
         <Grid container justify = 'center' spacing = {3} className="periode-container">
          <Grid item xs = {10}>

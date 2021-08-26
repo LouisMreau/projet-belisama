@@ -93,7 +93,7 @@ const MoreInfo = (props) => {
                     </CardContent>
 
                     <CardActions align ='center'>
-                        <Button size="small" onClick= {() => {window.open('https://ikhone.wixsite.com/belisama/projet', "_blank")}}>En savoir plus</Button>
+                        <Button variant = 'outlined' size="small" onClick= {() => {window.open('https://ikhone.wixsite.com/belisama/projet', "_blank")}}>En savoir plus</Button>
                     </CardActions>
                     </Card>
                 </TimelineContent>
@@ -117,13 +117,13 @@ const MoreInfo = (props) => {
                     Installation des premiers détecteurs 
                     </Typography>
                     <Typography variant='body1' component='p' align ='left'>
-                        {bull} Observatoire de Meudon 
+                        {bull} <a href = 'https://ikhone.wixsite.com/belisama/obspmeudon' target = '_blank'>Observatoire de Meudon</a>
                     </Typography>
                     <Typography variant='body1' component='p' align ='left'>
-                        {bull} Lycée de la Celle Saint Cloud
+                        {bull} <a href = 'https://ikhone.wixsite.com/belisama/cstcloud' target = '_blank'>Lycée de la Celle Saint Cloud</a>
                     </Typography>
                     <Typography variant='body1' component='p' align ='left'>
-                        {bull} Lycée Marie Curie de Sceaux
+                        {bull} <a href = 'https://ikhone.wixsite.com/belisama/macurie' target = '_blank'>Lycée Marie Curie de Sceaux</a>
                     </Typography>
                     </CardContent>
 
@@ -168,7 +168,7 @@ const MoreInfo = (props) => {
                     </Typography>
                     </CardContent>
                     <CardActions>
-                        <Button className = {classes.button} size="small" href = '/videos'>Découvrir</Button>
+                        <Button variant = 'outlined' className = {classes.button} size="small" href = '/videos'>Découvrir</Button>
                     </CardActions>
                 </Card>
                 </TimelineContent>
@@ -302,6 +302,9 @@ const MoreInfo = (props) => {
                     </Typography>
                     <Typography variant='body1' component='p' align ='left'>
                         {bull} Préparation d'un site de visualisation de données
+                    </Typography>
+                    <Typography variant='body1' component='p' align ='left'>
+                        Mise à disposition des fichiers de traitement en cours
                     </Typography>
                     </CardContent>
                 </Card>

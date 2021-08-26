@@ -3,7 +3,7 @@ import './style.css'
 import moment from 'moment'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import {Grid, Container, Button, Paper, Box, Typography, CircularProgress} from '@material-ui/core';
+import {Grid, Container, Button, Paper, Box, Typography, CircularProgress, Breadcrumbs} from '@material-ui/core';
 import JSZip from 'jszip';
 import JSZipUtils from 'jszip-utils'
 import FileSaver from 'file-saver';
@@ -28,6 +28,10 @@ const Download = (props) => {
     return (detector.id == props.detectorId);
     })[0].installation_date
   installation_date = installation_date + 'T00:00:00'
+
+  var city = dataDetector.filter(function (detector) {
+    return (detector.id == props.detectorId);
+    })[0].city
 
   const [downloadTimeValue, setDownloadTimeValue] = useState([]);
   const [downloadRawTimeValue, setDownloadRawTimeValue] = useState([]);
@@ -218,9 +222,25 @@ const Download = (props) => {
 
 
     return (
-      <Grid>
-      <Help page = 'Download'/>
-            <Container maxWidth="md">
+        <Grid>
+        <Grid item xs = {12}>
+        <Breadcrumbs aria-label="breadcrumb">
+            <Typography color="inherit">{city}</Typography>
+            <Typography color="textPrimary">Téléchargement</Typography>
+        </Breadcrumbs>
+        </Grid>
+        <Grid container direction = 'row-reverse'>
+          <Grid>
+          <Help page = 'Download'/>
+          </Grid>
+          {/* <Grid> */}
+          {/* <Box margin = '1em'></Box> */}
+          {/* </Grid> */}
+          {/* <Grid> */}
+          {/* <Button variant="outlined" color={color} startIcon={<CloudIcon />} onClick={() => {handleWeather()}}>Météo</Button> */}
+          {/* </Grid> */}
+        </Grid>
+            <Container maxWidth="lg">
               
               <Grid container justify = 'center' alignItems = 'center' className="download-container">
               <Grid item xs={12}>

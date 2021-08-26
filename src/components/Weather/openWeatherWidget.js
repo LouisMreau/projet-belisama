@@ -2,6 +2,7 @@ import {React, useEffect, useState} from 'react'
 import './style.css'
 import {Grid, Button, Box} from '@material-ui/core';
 import CloudIcon from '@material-ui/icons/Cloud';
+import CloudQueueIcon from '@material-ui/icons/CloudQueue';
 
 /**
 * @author
@@ -15,7 +16,8 @@ import CloudIcon from '@material-ui/icons/Cloud';
 const OpenWeatherWidget = (props) => {
     const city = props.city;
     const weatherURL = props.weatherURL
-    const [showWeather, setShowWeather] = useState(false)
+    // const firstClick = props.firstClick
+    var firstClick = true
 
     function weather(d,s,id) {
         var js,fjs=d.getElementsByTagName(s)[0];
@@ -23,14 +25,15 @@ const OpenWeatherWidget = (props) => {
             js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';
             fjs.parentNode.insertBefore(js,fjs);}
         };
-    
+
+
     
         
     return(
         <Grid container>
 
         <Grid container direction = 'justify'>
-        {showWeather && (
+        {firstClick && (
         <Grid item xs = {12}>
         <a class="weatherwidget-io" href={weatherURL} data-label_1={city.toUpperCase()} data-label_2="WEATHER" language='french' data-theme="original" ></a>
         {weather(document,'script','weatherwidget-io-js')}
@@ -38,10 +41,10 @@ const OpenWeatherWidget = (props) => {
         </Grid>
         )
         }
-        {!showWeather && (
+        {!firstClick && (
         <Grid container direction = 'row-reverse'>
         <Grid>
-            <Button variant="outlined" color="primary"  startIcon={<CloudIcon />} onClick={() => {setShowWeather(true)}}>Afficher la météo</Button>
+            {/* <Button variant="outlined" color="primary"  startIcon={<CloudIcon />} onClick={() => {setShowWeather(true)}}></Button> */}
             <Box margin ='2em'></Box>
         </Grid>
         </Grid>

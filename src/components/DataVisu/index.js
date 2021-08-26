@@ -16,7 +16,6 @@ import ShowChartIcon from '@material-ui/icons/ShowChart';
 import GraphicEqIcon from '@material-ui/icons/GraphicEq';
 import WarningIcon from '@material-ui/icons/Warning';
 
-import dataDetector from '../../resources/data/data_detector.json'
 import Download from '../Download/index';
 import Count from '../Count/count';
 import Energy from '../Energy/energy';
@@ -32,12 +31,12 @@ import OpenWeatherWidget from '../Weather/openWeatherWidget';
 
 
 const DataVisu = (props) => {
-  const schedule = require('node-schedule');
   let { detectorId } = useParams();
   const [dataLean, setDataLean] = useState([]);
+  const [dataDetector, setDataDetector] = useState([])
   const [isLoadinData, setIsLoadingData] = useState(true); 
-  const [loadingMessage, setloadingMessage] = useState("Chargement des données du détecteur..."); 
-  const [breakdown, setBreakdown] = useState(false); 
+  const [loadingMessage, setloadingMessage] = useState("Chargement des données du détecteur...");
+  const [breakdown, setBreakdown] = useState(false)
 
   Object.defineProperty(Array.prototype, 'flat', {
     value: function(depth = 1) {
@@ -51,27 +50,44 @@ const DataVisu = (props) => {
   for (var i = 0; i<399; i++) 
   {zeros[i] = 0}
 
-  const city = dataDetector.filter(function (detector) {
-    return (detector.id == detectorId);
-    })[0].city
-
-  const weatherURL = dataDetector.filter(function (detector) {
-    return (detector.id == detectorId);
-    })[0].weatherURL
-
+  useEffect(() => {
+    if ((dataLean.length > 0) && (dataDetector.length > 0)) {
+        setIsLoadingData(false)
+    }
+}, [dataLean, dataDetector])
 
   useEffect(() => {
     loadData();
   },[])
 
+  useEffect(() => {
+    loadDataDetector();
+  },[])
+
+  useEffect(() => {
+    if (dataDetector.length > 0) {
+      var status = dataDetector.filter(function (detector) {
+        return (detector.id == detectorId);
+        })[0].breakdown
+      setBreakdown(status)
+    }
+  }, [dataDetector])
+
+  const loadDataDetector = async () => {
+      await axios.get('https://data-belisama.s3.eu-west-3.amazonaws.com/data_detector.json')
+          .then(response => {
+              setDataDetector(response.data)
+            })
+          .catch(error => {
+            console.log("Données introuvables")
+          })
+    }
+
+
   const loadData = async () => {
     await axios.get('https://data-belisama.s3.eu-west-3.amazonaws.com/'+detectorId+'/data_lean_update.json')
         .then(response => {
             setDataLean(response.data)
-            let result = response.data[1].slice(response.data[1].length - 48, response.data[1].length -1).flat().every( e  => e == 0);
-            setBreakdown(result)
-            setIsLoadingData(false)
-
           })
         .catch(error => {
           console.log("Détecteur introuvable")
@@ -152,14 +168,14 @@ const DataVisu = (props) => {
     </Grid>
     }
     <TabPanel value={value} index={0}>
-      <OpenWeatherWidget city = {city} weatherURL = {weatherURL}/>
-      <Count dataLean = {dataLean} detectorId = {detectorId} />
+      {/* <OpenWeatherWidget city = {city} weatherURL = {weatherURL}/> */}
+      <Count dataLean = {dataLean} detectorId = {detectorId} dataDetector = {dataDetector} />
     </TabPanel>
     <TabPanel value={value} index={1}>
-      <Energy dataLean = {dataLean} detectorId = {detectorId} />
+      <Energy dataLean = {dataLean} detectorId = {detectorId} dataDetector = {dataDetector}/>
     </TabPanel>
     <TabPanel value={value} index={2}>
-      <Download dataLean ={dataLean} detectorId = {detectorId}/>
+      <Download dataLean ={dataLean} detectorId = {detectorId} dataDetector = {dataDetector}/>
     </TabPanel>
     
 

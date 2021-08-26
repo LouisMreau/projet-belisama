@@ -29,10 +29,25 @@ import ComparePeriod from '../Comparaison/ComparePeriod';
 const Comparaison = (props) => {
 
   const [value, setValue] = useState(0);
+  const [dataDetector, setDataDetector] = useState([])
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  useEffect(() => {
+    loadDataDetector();
+  },[])
+
+  const loadDataDetector = async () => {
+    await axios.get('https://data-belisama.s3.eu-west-3.amazonaws.com/data_detector.json')
+        .then(response => {
+            setDataDetector(response.data)
+          })
+        .catch(error => {
+          console.log("Données introuvables")
+        })
+  }
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -86,10 +101,10 @@ const Comparaison = (props) => {
       </Paper>
     </AppBar>
     <TabPanel value={value} index={0}>
-      <CompareDetector />
+      <CompareDetector dataDetector = {dataDetector} />
     </TabPanel>
     <TabPanel value={value} index={1}>
-      <ComparePeriod />
+      <ComparePeriod dataDetector = {dataDetector} />
     </TabPanel>
     </div>
 

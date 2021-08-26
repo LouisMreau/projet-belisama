@@ -80,6 +80,10 @@ export default function ChartCPeriod(props) {
             dataLabels: {
                 enabled: false
             },
+            legend: {
+                show: true,
+                showForSingleSeries: true,
+            },
             markers: {
                 size: 0,
             },

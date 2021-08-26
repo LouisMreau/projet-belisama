@@ -8,7 +8,6 @@ import {Grid, Box, Typography, FormControl, Breadcrumbs, Link, CircularProgress}
 
 import axios from 'axios';
 
-import dataDetector from '../../resources/data/data_detector.json';
 import Count2 from '../Count/count2';
 import Energy2 from '../Energy/energy2';
 
@@ -23,6 +22,7 @@ const CompareDetector = (props) => {
     const [dataLean2, setDataLean2] = useState([]);
     const [detector1, setDetector1] = useState('');
     const [detector2, setDetector2] = useState('');
+    const dataDetector = props.dataDetector
     const [type, setType] = useState('');
     const [showGraph, setShowGraph] = useState(false)
 
@@ -35,7 +35,7 @@ const CompareDetector = (props) => {
     },[detector2]); 
     
     useEffect(() => {
-        if ((dataLean1.length > 0) && (dataLean2.length > 0)) {
+        if ((dataLean1.length > 0) && (dataLean2.length > 0) && (dataDetector.length > 0)) {
             setShowGraph(true)
         }
     }, [dataLean1, dataLean2])
@@ -170,12 +170,12 @@ const CompareDetector = (props) => {
                     )}
                     {(showGraph) && (detector1) && (detector2) && (type == "count") && (
                         <Grid item xs={12}>
-                            <Count2 dataLean1 = {dataLean1} detectorId1 = {detector1} dataLean2 = {dataLean2} detectorId2 = {detector2}/>
+                            <Count2 dataLean1 = {dataLean1} detectorId1 = {detector1} dataLean2 = {dataLean2} detectorId2 = {detector2} dataDetector = {dataDetector} />
                         </Grid>
                     )}
                     {(showGraph) && (detector1) && (detector2) && (type == "spectrum") && (
                         <Grid item xs={12}>
-                            <Energy2 dataLean1 = {dataLean1} detectorId1 = {detector1} dataLean2 = {dataLean2} detectorId2 = {detector2}/>
+                            <Energy2 dataLean1 = {dataLean1} detectorId1 = {detector1} dataLean2 = {dataLean2} detectorId2 = {detector2} dataDetector = {dataDetector} />
                         </Grid>
                     )}
                 </Grid>

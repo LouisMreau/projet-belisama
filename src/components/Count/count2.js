@@ -14,7 +14,7 @@ import {Grid, Container, Button, Paper, Box, Typography} from '@material-ui/core
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import csvjson from 'csvjson'
 
-import dataDetector from '../../resources/data/data_detector.json';
+
 import CountViewer from '../Chart/CountViewer'
 
 
@@ -34,6 +34,8 @@ const Count2 = (props) => {
   
   var dataLean1 = props.dataLean1;
   var dataLean2 = props.dataLean2;
+
+  const dataDetector = props.dataDetector;
 
   const maximumOfTwoDates = (date1, date2) => {
     return (date1 > date2 ? date1 : date2)

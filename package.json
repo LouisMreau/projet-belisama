@@ -72,6 +72,7 @@
     ]
   },
   "devDependencies": {
-    "chokidar": "^3.5.2"
+    "chokidar": "^3.5.2",
+    "video.js": "^7.14.3"
   }
 }

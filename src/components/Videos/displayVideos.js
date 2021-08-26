@@ -6,12 +6,15 @@ import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
 
 /**
 * @author
-* @function Videos
+* @function displayVideos
 * Renvoie la page des vidéos tutoriels dont l'accès se fait à partir de la page A propos
 **/
 
-const Videos = (props) => {
-  return(
+const displayVideos = (props) => {
+
+
+
+    return(
 
        <Container maxWidth ="md">
 
@@ -21,6 +24,7 @@ const Videos = (props) => {
             </Grid>
 
             <Grid item xs = {12}>
+
             <ReactPlayer 
             url="https://www.youtube.com/watch?v=q7OS5_RgmyE&ab_channel=ASTROPIKU"
             width = '100%'
@@ -104,4 +108,4 @@ const Videos = (props) => {
 
  }
 
-export default Videos
+export default displayVideos

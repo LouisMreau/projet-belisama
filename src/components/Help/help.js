@@ -100,12 +100,8 @@ const Help = (props) => {
     }, [open]);
 
     return(
-        <Grid container direction = 'row-reverse'>
-        <Grid>
+        <Grid container >
             <Button variant="outlined" color="primary" startIcon={<HelpOutlineIcon />} onClick={handleClickOpen('body')}>Besoin d'aide ?</Button>
-            <Box margin ='2em'></Box>
-        </Grid>
-
         <Dialog
         open={open}
         onClose={handleClose}

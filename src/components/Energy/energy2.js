@@ -12,7 +12,6 @@ import axios from 'axios';
 import {Grid, Container, Button, Paper, Box, Typography, FormControlLabel, Switch} from '@material-ui/core';
 import csvjson from 'csvjson'
 
-import dataDetector from '../../resources/data/data_detector.json';
 import EnergyViewer from '../Chart/EnergyViewer'
 
 /**
@@ -27,6 +26,7 @@ import EnergyViewer from '../Chart/EnergyViewer'
 const Energy2 = (props) => {
     const detectorId1  = props.detectorId1;
     const detectorId2  = props.detectorId2;
+    const dataDetector = props.dataDetector;
   
     var installation_date1 = dataDetector.filter(function (detector1) {
         return (detector1.id == detectorId1);
