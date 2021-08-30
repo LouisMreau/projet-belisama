@@ -1,21 +1,17 @@
-import {React} from 'react'
-import './style.css'
+import { React } from "react";
+import "./style.css";
 
 /**
-* @author
-* @function Home
-**/
+ * @author
+ * @function Home
+ **/
 
 const Home = (props) => {
-  
-  return(
-      <div className="home-container">
-        
-          <div>Home</div>
-        
-    </div> 
-   )
+  return (
+    <div className="home-container">
+      <div>Home</div>
+    </div>
+  );
+};
 
- }
-
-export default Home
+export default Home;

@@ -6,7 +6,7 @@ import moment from 'moment'
 * @function CountViewer
 * Lance le graphiques adapté au taux de comptage
 * Prend en props un array avec en premier élément les noms des séries et en deuxième position le titre du graphique 
-* Prend également les données dans le format suivant : [{x : value, y : value}, ...]
+* Prend les données dans le format suivant : [{x : value, y : value}, ...]
 **/
 
 export default function CountViewer(props) {
@@ -22,10 +22,11 @@ export default function CountViewer(props) {
           data : data[index]
       });
   })
-
+  // Définition des options du graphique : 
+  // outil par défaut (zoom), barre d'outils, fichiers d'exportation, formatter des valeurs, responsive
   const options = {
     chart: {
-      autoSelected : 'selection',
+      autoSelected : 'zoom',
       id : 'countChart',
       type: 'line',
       stacked: false,
@@ -42,12 +43,12 @@ export default function CountViewer(props) {
         show : true,
         tools: {
           download: true,
-          selection: false,
-          zoom: false,
-          zoomin: false,
-          zoomout: false,
-          pan: false,
-          reset : false,
+          selection: true,
+          zoom: true,
+          zoomin: true,
+          zoomout: true,
+          pan: true,
+          reset : true,
         },
         export: {
           csv: {
@@ -92,6 +93,7 @@ export default function CountViewer(props) {
           return val.toFixed(0);
         },
       },
+      tickAmount : 3,
       lines: {
         show: true,
       },

@@ -1,25 +1,25 @@
-.download-container{
-    margin: auto auto;
-    align-items: center;
-    width: 60%;
-    margin-bottom: 50px;
-    padding: 1em;
+.download-container {
+  margin: auto auto;
+  align-items: center;
+  width: 60%;
+  margin-bottom: 50px;
+  padding: 1em;
 }
 
-.download_button{
-    display: flex;
-    justify-content: center;
-    margin-bottom : 100px ;
-    margin-top: 100px;
-    margin-left: auto;
-    margin-right: auto;
+.download_button {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 100px;
+  margin-top: 100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .download_data {
-    padding: auto;
-    margin: auto;
+  padding: auto;
+  margin: auto;
 }
 
-.title{
-    font-weight: bold;
+.title {
+  font-weight: bold;
 }

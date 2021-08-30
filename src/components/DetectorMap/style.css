@@ -1,13 +1,10 @@
-
-
-.map-container{
-    margin-top: 2%;
-    margin-left: 15%;
-    margin-right: 15%;
+.map-container {
+  margin-top: 2%;
+  margin-left: 15%;
+  margin-right: 15%;
 }
 
-.leaflet-container{
-    width: 100%;
-    height: 500px;
+.leaflet-container {
+  width: 100%;
+  height: 500px;
 }
-

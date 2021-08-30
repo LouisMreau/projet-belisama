@@ -1,59 +1,65 @@
-import {React, useEffect, useState} from 'react'
-import './style.css'
-import {Grid, Button, Box} from '@material-ui/core';
-import CloudIcon from '@material-ui/icons/Cloud';
-import CloudQueueIcon from '@material-ui/icons/CloudQueue';
+import { React } from "react";
+import "./style.css";
+import { Grid, Box } from "@material-ui/core";
 
 /**
-* @author
-* @function openWeatherWidget
-* Donne la météo d'une ville donnée en propriété
-**/
-
-
-
+ * @author
+ * @function openWeatherWidget
+ * Donne la météo d'une ville donnée en props ainsi que le lien vers un site où il est possible de consulter des oragse en temps réel
+ **/
 
 const OpenWeatherWidget = (props) => {
-    const city = props.city;
-    const weatherURL = props.weatherURL
-    // const firstClick = props.firstClick
-    var firstClick = true
+  const city = props.city;
+  const weatherURL = props.weatherURL;
+  // const firstClick = props.firstClick
+  var firstClick = true;
 
-    function weather(d,s,id) {
-        var js,fjs=d.getElementsByTagName(s)[0];
-        if(!d.getElementById(id)){js=d.createElement(s);
-            js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';
-            fjs.parentNode.insertBefore(js,fjs);}
-        };
+  function weather(d, s, id) {
+    var js,
+      fjs = d.getElementsByTagName(s)[0];
+    if (!d.getElementById(id)) {
+      js = d.createElement(s);
+      js.id = id;
+      js.src = "https://weatherwidget.io/js/widget.min.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }
+  }
 
-
-    
-        
-    return(
-        <Grid container>
-
-        <Grid container direction = 'justify'>
+  return (
+    <Grid container>
+      <Grid container direction="justify">
         {firstClick && (
-        <Grid item xs = {12}>
-        <a class="weatherwidget-io" href={weatherURL} data-label_1={city.toUpperCase()} data-label_2="WEATHER" language='french' data-theme="original" ></a>
-        {weather(document,'script','weatherwidget-io-js')}
-        <p>Pour avoir la carte des orages en temps réel, voir <a href = 'https://map.blitzortung.org/#5.21/47.078/2.367' target = '_blank'>ici</a></p>
-        </Grid>
-        )
-        }
-        {!firstClick && (
-        <Grid container direction = 'row-reverse'>
-        <Grid>
-            {/* <Button variant="outlined" color="primary"  startIcon={<CloudIcon />} onClick={() => {setShowWeather(true)}}></Button> */}
-            <Box margin ='2em'></Box>
-        </Grid>
-        </Grid>
+          <Grid item xs={12}>
+            <a
+              class="weatherwidget-io"
+              href={weatherURL}
+              data-label_1={city.toUpperCase()}
+              data-label_2="WEATHER"
+              language="french"
+              data-theme="original"
+            ></a>
+            {weather(document, "script", "weatherwidget-io-js")}
+            <p>
+              Pour avoir la carte des orages en temps réel, voir{" "}
+              <a
+                href="https://map.blitzortung.org/#5.21/47.078/2.367"
+                target="_blank"
+              >
+                ici
+              </a>
+            </p>
+          </Grid>
         )}
-        </Grid>
-        </Grid>
-        
-       
-    )
-  };
+        {!firstClick && (
+          <Grid container direction="row-reverse">
+            <Grid>
+              <Box margin="2em"></Box>
+            </Grid>
+          </Grid>
+        )}
+      </Grid>
+    </Grid>
+  );
+};
 
-export default OpenWeatherWidget
+export default OpenWeatherWidget;
