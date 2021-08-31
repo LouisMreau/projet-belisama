@@ -16,7 +16,8 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 /**
  * @author
  * @function displayVideos
- * Renvoie la page des vidéos tutoriels dont l'accès se fait à partir de la page A propos
+ * Returns a page with all the videos filmed for the project
+ * To access this page, the user must click on the button Decouvrir in the about page
  **/
 
 const displayVideos = (props) => {

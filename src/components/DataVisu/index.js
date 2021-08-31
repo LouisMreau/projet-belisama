@@ -32,8 +32,8 @@ import OpenWeatherWidget from "../Weather/openWeatherWidget";
 /**
  * @author
  * @function DataVisu
- * Permet l'affichage des trois onglets : Taux de comptage, Spectre en énergie, Téléchargements avec navigation en utilisant une AppBar
- * Charge le dataLean du détecteur choisi et les informations des détecteurs (dataDetector)
+ * Displays the AppBar to switch between three sections : counting graph, energy graph, downloading
+ * Loads the data for one particular detector selected on the home page (map) and loads the information concerning all detectors
  **/
 
 const DataVisu = (props) => {
@@ -44,7 +44,7 @@ const DataVisu = (props) => {
   const [loadingMessage, setloadingMessage] = useState(
     "Chargement des données du détecteur..."
   );
-  // Détermine si un detecteur fonctionne ou non en lisant le fichier dataDetector
+  // Determine if the detector is broken/does not send data by reading the dataDetector file
   const [breakdown, setBreakdown] = useState(false);
 
   useEffect(() => {

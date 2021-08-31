@@ -26,7 +26,7 @@ import ComparePeriod from "../Comparaison/ComparePeriod";
 /**
  * @author
  * @function Comparaison
- * Crée l'AppBar permettant de switcher entre les pages de comparaison par détecteur ou par période
+ * Loads the data concerning all the detectors and displays the appbar that enables to switch from one comparison type to another
  **/
 
 const Comparaison = (props) => {

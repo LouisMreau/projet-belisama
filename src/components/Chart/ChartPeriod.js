@@ -4,11 +4,11 @@ import moment from "moment";
 /**
  * @author
  * @function ChartPeriod
- * Lance les graphiques adaptés à la comparaison de deux périodes pour un même détecteur pour le taux de comptage
+ * Return the counting graph for two differents periods and one detector
  **/
 
 export default function ChartPeriod(props) {
-  // Les dates données en props du composant : début et fin des deux périodes
+  // Takes in props the twwo periods (starting date and ending date)
   const startDate1 = props.startDate1;
   const startDate2 = props.startDate2;
   const endDate1 = props.endDate1;
@@ -34,7 +34,7 @@ export default function ChartPeriod(props) {
     new Date(endDate2).getDate(),
   ]);
 
-  // Définition des deux séries
+  // Defining the two series
   const seriesLine1 = [
     {
       name: "Nombre de photons par heure",
@@ -48,8 +48,8 @@ export default function ChartPeriod(props) {
       data: props.data2,
     },
   ];
-  // Définition des options du graphique : 
-  // outil par défaut (zoom), barre d'outils, fichiers d'exportation, formatter des valeurs, responsive
+  // Defining the graph options 
+  // autoselected tool (zoom), toolbar, exported files, value formatter, responsive
   const options = (start, end) => {
     return {
       chart: {
@@ -165,7 +165,7 @@ export default function ChartPeriod(props) {
         },
       },
       colors: ["#09476e"],
-      // Adaptation du graphique en fonction de la taille de l'écran
+      // Graph adaptation according to the screen size
       responsive: [
         {
           breakpoint: 600,

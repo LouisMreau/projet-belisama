@@ -14,17 +14,18 @@ import ChartPeriod from "../Chart/ChartPeriod";
 /**
  * @author
  * @function CountPeriod
- * Permet à l'utilisateur de sélectionner deux périodes pour l'étude du taux de comptage
- * Construit le nuage de points pour le taux de comptage et appelle ChartViewer pour afficher les deux graphiques côte à côte
- * En props : id de détecteur et ses données traitées et le fichier qui donne les informations sur les détecteurs (nom, place...)
- * Se référer à count.js pour plus d'informations sur les fonctions 
+ * Displays the counting graph for two periods
+ * Builds the data and calls ChartPeriod to draw the graphs (one onthe top of the other)
+ * Props : One detector id, its data and information concerning all detectors (name, place, ...)
+ * Please refer to count.js for more information
 **/
 
 const CountPeriod = (props) => {
   var detectorId = props.detectorId;
   var dataLean = props.dataLean;
   const dataDetector = props.dataDetector;
-
+  // Defining the installation data to ensure the visualization of the available data
+  // installation_date is a date object
   var installation_date = dataDetector.filter(function (detector) {
     return detector.id == detectorId;
   })[0].installation_date;
@@ -41,8 +42,8 @@ const CountPeriod = (props) => {
     dataLean[0][2],
     dataLean[0][2] + 7000,
   ]);
-  // Décalage horaire de 2 heures à prendre en compte pour la date de fin 
-  // le timestamp de la fin du dataLean s'appuie sur le nom du fichier qui est une date locale mais est comprise en tant que data UTC lors de la transformation
+  // !!! Must take into account the two hour lag !!!
+  // The second timestamp in the datalean has been understood as a UTC date and not a locale date, thus it has added two hours (GMT +02) in the transformation
   const [countData1, setCountData1] = useState([]);
   const [countData2, setCountData2] = useState([]);
   const [startDate1, setStartDate1] = useState(new Date(installation_date));
@@ -59,7 +60,7 @@ const CountPeriod = (props) => {
   useEffect(() => {
     if (dataLean.length > 0) {
       setCountSliderValue([dataLean[0][2], dataLean[0][2] + 7000]);
-      // Décalage horaire de 2 heures à prendre en compte
+      // THe two hour lag
       setStartDate1(new Date(installation_date));
       setEndDate1(addDays(new Date(installation_date), 1));
       setStartDate2(addDays(new Date(installation_date), 1));

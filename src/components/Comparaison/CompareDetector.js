@@ -25,7 +25,7 @@ import Energy2 from "../Energy/energy2";
 /**
  * @author
  * @function CompareDetector
- * Permet le chargement des données pour deux détecteurs donnés en input par l'utilisateur grâce à un MenuItem
+ * GIven two detectors (chosen by the user), loads the data of these two detectors 
  **/
 
 const CompareDetector = (props) => {
@@ -38,20 +38,20 @@ const CompareDetector = (props) => {
   const [showGraph, setShowGraph] = useState(false);
   const [loadingData, setLoadingData] = useState(false);
 
-  // Dès que l'utilisateur change les valeurs sélectionnées, le graphique est caché
+  // Once the user changes one of the variables, the graph is hidden
   useEffect(() => {
     setShowGraph(false);
     setLoadingData(false);
   }, [detector1, detector2, type]);
 
-  // Chargement des données
+  // Loading the data
   useEffect(() => {
     if (loadingData && detector1.length > 0 && detector2.length > 0) {
       loadData(detector1, detector2);
     }
   }, [loadingData]);
 
-  // Affichage des données
+  // Displaying the data
   useEffect(() => {
     if (loadingData == false) {
       setShowGraph(true);
@@ -87,7 +87,7 @@ const CompareDetector = (props) => {
       });
   };
 
-  // Sélection des valeurs
+  // Selection : detector, graph type
   const handleChangeDetector1 = (event) => {
     setDetector1(event.target.value);
   };

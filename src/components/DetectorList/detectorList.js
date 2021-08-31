@@ -60,8 +60,8 @@ const BootstrapButton = withStyles({
 /**
  * @author
  * @function DetectorList
- * Permet à l'utilisateur de sélectionner un détecteur parmi les détecteurs d'une liste
- * Prend en props un fichier DataDetector qui contient les informations relatives à tous les détecteurs
+ * Returns a list of detectors with information concerning them (place, installation date) and let the user select one
+ * Takes in props the information about detectors in a json object
  **/
 
 export default function DetectorList(props) {
@@ -78,7 +78,7 @@ export default function DetectorList(props) {
                 primary={detector.place}
                 secondary={
                   <Fragment>
-                    <Typography
+                    {/* <Typography
                       component="span"
                       variant="body2"
                       className={classes.inline}
@@ -87,7 +87,7 @@ export default function DetectorList(props) {
                       {"Contact : "}
                     </Typography>
                     {detector.contact}
-                    <br />
+                    <br /> */}
                     <Typography
                       component="span"
                       variant="body2"

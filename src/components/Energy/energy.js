@@ -21,37 +21,43 @@ import Help from "../Help/help";
 /**
  * @author
  * @function Energy
- * Permet d'afficher le graphique du spectre en énergie pour un détecteur (chargement des données réalisé au préalable et donné en props)
+ * Displays the energy graph for a selected detector
+ * detectorId is a string that indicates the id of the detector (eg. obsmeudon)
+ * dataDetector is a json object that gives information about each detector (name, id, place,...)
+ * dataLean is an array that enumerates the number of arriving photons for each energy interval and each hour. It has the following format :
+ * [[start_timestamp, end_timestamp, start_energy, number_of_energy_interval][[first_hour],[second_hour],[],...,[last_hour]]].
  **/
 
 const Energy = (props) => {
   const detectorId = props.detectorId;
   const dataLean = props.dataLean;
   const dataDetector = props.dataDetector;
-  // Definition de la date d'installation pour la sélection de dates avec des données disponibles
+  // Defining the installation data to ensure the visualization of the available data
+  // installation_date is a date object
   var installation_date = dataDetector.filter(function (detector) {
     return detector.id == detectorId;
   })[0].installation_date;
   installation_date = installation_date + "T00:00:00";
 
-  // Définit la ville pour l'entete breadcrumbs
+  // Defining the city for the header on the top of the page
   var city = dataDetector.filter(function (detector) {
     return detector.id == detectorId;
   })[0].city;
 
-  // Décalage horaire de 2 heures à prendre en compte pour la date de fin 
-  // le timestamp de la fin du dataLean s'appuie sur le nom du fichier qui est une date locale mais est comprise en tant que data UTC lors de la transformation
+  // !!! Must take into account the two hour lag !!!
+  // The second timestamp in the datalean has been understood as a UTC date and not a locale date, thus it has added two hours (GMT +02) in the transformation
   const [spectrumTimeValue, setSpectrumTimeValue] = useState([
     new Date(installation_date),
     new Date(dataLean[0][1] - 2 * 3600 * 1000),
   ]);
   const [spectrumData, setSpectrumData] = useState([]);
+  // loadingDate is a boolean  that indicates whether the loading data has finished or not
   const [loadingData, setLoadingData] = useState(false);
+  // switchState is a boolean that indicates whether the data is logarithmic or not
   const [switchState, setSwitchState] = useState(false);
 
   const handleChangeSwitch = (event) => {
     setLoadingData(true);
-    console.log(switchState);
     setSwitchState(event.target.checked);
   };
 
@@ -75,9 +81,8 @@ const Energy = (props) => {
 
   useEffect(() => {
     if (dataLean.length > 0) {
-      // Décalage horaire de 2 heures à prendre en compte pour la date de fin
-      // le timestamp de la fin du dataLean s'appuie sur le nom du fichier qui est une date locale mais est comprise en tant que data UTC lors de la transformation
-      setSpectrumTimeValue([
+        // the two hour lag must be taken into account
+        setSpectrumTimeValue([
         new Date(installation_date),
         new Date(dataLean[0][1] - 2 * 3600 * 1000),
       ]);
@@ -85,7 +90,7 @@ const Energy = (props) => {
     }
   }, [dataLean]);
 
-  // On définit les heures limites du jeu de données traitées, attention, le fuseau horaire n'est pas le même
+  // Defining the limit dates of the data visualization
   const start_date_limit = moment(new Date(dataLean[0][0]));
   const end_date_limit = moment(new Date(dataLean[0][1] - 2 * 3600 * 1000));
 
@@ -106,27 +111,30 @@ const Energy = (props) => {
   };
 
   const loadSpectrum = (dataLean, inf_time, sup_time, energy_interval) => {
-    // Traite les données pour déterminer la densité pour un intervalle d'énergie donné 
+    // Processes data to determine the energy density for each energy interval
+    // DataLean is the processed data (array type)
+    // inf_time, sup_time : the dates that limit the data visualization 
+    // energy_interval : the pace between each energy interval
 
-    // Initialisation
+    // Initialization
     let energies = [];
     let densities = new Array(dataLean[1][0].length);
     for (let i = 0; i < dataLean[1][0].length; ++i) densities[i] = 0;
     let total_density = 0;
 
-    // Définition de l'axe x avec les différentes énergies
+    // List of all energy intervals
     for (var j = 0; j < dataLean[1][0].length; j++) {
       energies[j] = dataLean[0][2] + j * energy_interval;
     }
 
-    // Pour une même énergie on somme sur les intervalles de temps
+    // For a given energy interval, sums the number of arriving photons
     for (var i = inf_time; i < sup_time; i++) {
       for (var j = 0; j < dataLean[1][0].length; j++) {
         densities[j] = densities[j] + dataLean[1][i][j];
         total_density += dataLean[1][i][j];
       }
     }
-    // On divise par le nombre total de photons arrivés
+    // Divides by the total
     for (var j = 0; j < densities.length; j++) {
       densities[j] /= total_density;
     }
@@ -135,7 +143,7 @@ const Energy = (props) => {
   };
 
   const setSpectrum = (dataLean) => {
-    // Traite les données en lui appliquant la fonction de traitement et en les mettant sous le bon format
+    // Processed data by applying the previous transformation and transforms it into a json object
     let start_time =
       (spectrumTimeValue[0].getTime() - dataLean[0][0]) / 1000 / 3600;
     let end_time =
@@ -146,6 +154,7 @@ const Energy = (props) => {
   };
 
   async function switchToLogarithmData(data) {
+    // Transforms data by applying on each value the logarithmic formula
     let logData = data;
     for (let key in logData) {
       let y = logData[key].y;
@@ -164,7 +173,8 @@ const Energy = (props) => {
   ];
 
   const options = {
-    // Définit les options du graphique
+    // Defining the graph options 
+    // autoselected tool (zoom), toolbar, exported files, value formatter, responsive
     chart: {
       type: "area",
       stacked: false,

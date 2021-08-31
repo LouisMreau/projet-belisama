@@ -18,16 +18,20 @@ import EnergyViewer from "../Chart/EnergyViewer";
 /**
  * @author
  * @function Energy2
- * Permet à l'utilisateur de sélectionner deux détecteurs pour l'étude du spectre en énergie
- * Construit le nuage de points pour le spectre en énergie et appelle EnergyViewer pour afficher le graphique
- * Se référer à energy.js pour plus d'informations sur les fonctions
+ * Displays the energy graph for two detectors
+ * Builds the data and calls EnergyViewer to draw the graph
+ * Props : Two detector id, their data (dataLean) and information concerning all detectors (name, place, ...)
+ * Please refer to energy.js for more information
  **/
 
 const Energy2 = (props) => {
   const detectorId1 = props.detectorId1;
   const detectorId2 = props.detectorId2;
   const dataDetector = props.dataDetector;
-
+  var dataLean1 = props.dataLean1;
+  var dataLean2 = props.dataLean2;
+  // Defining the installation data to ensure the visualization of the available data
+  // installation_date is a date object
   var installation_date1 = dataDetector.filter(function (detector1) {
     return detector1.id == detectorId1;
   })[0].installation_date;
@@ -42,15 +46,15 @@ const Energy2 = (props) => {
   const maximumOfTwoDates = (date1, date2) => {
     return date1 > date2 ? date1 : date2;
   };
-  // Definition de la date d'installation pour la sélection de dates avec des données disponibles
+  
   const installation_date = maximumOfTwoDates(
     installation_date1,
     installation_date2
   );
-  var dataLean1 = props.dataLean1;
-  var dataLean2 = props.dataLean2;
 
-  // Décalage horaire de 2 heures à prendre en compte
+
+   // !!! Must take into account the two hour lag !!!
+  // The second timestamp in the datalean has been understood as a UTC date and not a locale date, thus it has added two hours (GMT +02) in the transformation
   const [spectrumTimeValue, setSpectrumTimeValue] = useState([
     new Date(installation_date),
     new Date(dataLean1[0][1] - 2 * 3600 * 1000),
@@ -101,7 +105,6 @@ const Energy2 = (props) => {
 
   useEffect(() => {
     if (dataLean1.length > 0) {
-      // Décalage horaire de 2 heures à prendre en compte
       setSpectrumTimeValue([
         new Date(installation_date),
         new Date(dataLean1[0][1] - 2 * 3600 * 1000),
@@ -110,8 +113,8 @@ const Energy2 = (props) => {
     }
   }, [dataLean1, dataLean2]);
 
-  // Décalage horaire de 2 heures à prendre en compte pour la date de fin 
-  // le timestamp de la fin du dataLean s'appuie sur le nom du fichier qui est une date locale mais est comprise en tant que data UTC lors de la transformation
+  // !!! Must take into account the two hour lag !!!
+  // The second timestamp in the datalean has been understood as a UTC date and not a locale date, thus it has added two hours (GMT +02) in the transformation
   const start_date_limit = moment(new Date(dataLean1[0][0]));
   const end_date_limit = moment(new Date(dataLean1[0][1] - 2 * 3600 * 1000));
 

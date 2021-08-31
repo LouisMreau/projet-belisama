@@ -1,6 +1,5 @@
 import React from "react";
 import "./style.css";
-import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Timeline from "@material-ui/lab/Timeline";
 import TimelineItem from "@material-ui/lab/TimelineItem";
@@ -13,10 +12,8 @@ import {
   Grid,
   Container,
   Button,
-  Paper,
   Box,
   Typography,
-  CircularProgress,
   IconButton,
   Hidden,
 } from "@material-ui/core";
@@ -33,7 +30,7 @@ import video from "../../resources/icons/videos.jpg";
 /**
  * @author
  * @function MoreInfo
- * Renvoie la page A propos qui donne une timeline du projet ainsi que les coordonnées des intervenants et des contributeurs du site Internet
+ * Returns the about page with a timeline of the project and a list of the contributors
  **/
 
 const MoreInfo = (props) => {

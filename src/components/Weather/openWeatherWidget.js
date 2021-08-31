@@ -5,7 +5,7 @@ import { Grid, Box } from "@material-ui/core";
 /**
  * @author
  * @function openWeatherWidget
- * Donne la météo d'une ville donnée en props ainsi que le lien vers un site où il est possible de consulter des oragse en temps réel
+ * Gives the weather with a seven day forecast for one city given and gives info on realtime lightning 
  **/
 
 const OpenWeatherWidget = (props) => {

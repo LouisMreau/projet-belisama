@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useRef, Component } from "react";
+import { React, useState, useEffect } from "react";
 import "./style.css";
 import Chart from "react-apexcharts";
 import moment from "moment";
@@ -22,41 +22,48 @@ import OpenWeatherWidget from "../Weather/openWeatherWidget";
 /**
  * @author
  * @function Count
- * Permet d'afficher le graphique de taux de comptage pour un détecteur (chargement des données réalisé au préalable et donné en props)
+ * Display the counting graph given a detector, its processed data (dataLean) and information concerning all the detectors
+ * detectorId is a string that indicates the id of the detector (eg. obsmeudon)
+ * dataDetector is a json object that gives information about each detector (name, id, place,...)
+ * dataLean is an array that enumerates the number of arriving photons for each energy interval and each hour. It has the following format :
+ * [[start_timestamp, end_timestamp, start_energy, number_of_energy_interval][[first_hour],[second_hour],[],...,[last_hour]]].
  **/
 
 const Count = (props) => {
   const detectorId = props.detectorId;
   const dataDetector = props.dataDetector;
   var dataLean = props.dataLean;
-  // Definition de la date d'installation pour la sélection de dates avec des données disponibles
+  // Defining the installation data to ensure the visualization of the available data
+  // installation_date is a date object
   var installation_date = dataDetector.filter(function (detector) {
     return detector.id == detectorId;
   })[0].installation_date;
   installation_date = installation_date + "T00:00:00";
 
-  // Definition de la ville du détecteur pour la carte météo
+  // Defining the city for the weather widget
   var city = dataDetector.filter(function (detector) {
     return detector.id == detectorId;
   })[0].city;
 
+  // Weather widget
   var weatherURL = dataDetector.filter(function (detector) {
     return detector.id == detectorId;
   })[0].weatherURL;
 
+  // Slider that selects the energy interval
   const [countSliderValue, setCountSliderValue] = useState([
     dataLean[0][2],
     dataLean[0][2] + 7000,
   ]);
-  // Décalage horaire de 2 heures à prendre en compte pour la date de fin 
-  // le timestamp de la fin du dataLean s'appuie sur le nom du fichier qui est une date locale mais est comprise en tant que data UTC lors de la transformation
+  // !!! Must take into account the two hour lag !!!
+  // The second timestamp in the datalean has been understood as a UTC date and not a locale date, thus it has added two hours (GMT +02) in the transformation
   const [countTimeValue, setCountTimeValue] = useState([
     new Date(installation_date),
     new Date(dataLean[0][1] - 2 * 3600 * 1000),
   ]);
   const [countData, setCountData] = useState([]);
   const [showWeather, setShowWeather] = useState(false);
-  const [weatherColor, setWeatherColor] = useState("primary"); 
+  const [weatherColor, setWeatherColor] = useState("primary");
 
   useEffect(() => {
     if (dataLean.length > 0) setCountSerie(dataLean);
@@ -65,7 +72,7 @@ const Count = (props) => {
   useEffect(() => {
     if (dataLean.length > 0) {
       setCountSliderValue([dataLean[0][2], dataLean[0][2] + 7000]);
-      // Décalage horaire de 2 heures à prendre en compte
+      // The two hour lag must be taken into account
       setCountTimeValue([
         new Date(installation_date),
         new Date(dataLean[0][1] - 2 * 3600 * 1000),
@@ -86,7 +93,7 @@ const Count = (props) => {
   };
 
   function handleWeather() {
-    // Actualise la couleur du bouton et l'affichage de la météo
+    // Display the weather widget and transform the color of the button
     var x = document.getElementById("weather");
     if (!showWeather) {
       x.style.display = "block";
@@ -100,6 +107,9 @@ const Count = (props) => {
   }
 
   const createChartData = (xx, yy) => {
+    // Transforms two arrays into a json format object for data visualization
+    // xx : the array containing all the x values
+    // yy : the array containing all the y values
     let chartData = [];
     for (var i = 0; i < yy.length; i++) {
       chartData.push({ x: xx[i], y: yy[i] });
@@ -108,7 +118,9 @@ const Count = (props) => {
   };
 
   const loadCountSerie = (
-    // Traite les données pour sommer les photons sur différentes énergies sur un même intervalle de temps
+    // Sums the number of arriving photons for a specific time range
+    // inf_energy, sup_energy are the two energy limits given in the dataLean variable
+    // inf_time, sup_time are the two time limits given in the dataLean variable
     dataLean,
     inf_energy,
     sup_energy,
@@ -127,7 +139,7 @@ const Count = (props) => {
   };
 
   const setCountSerie = (dataLean) => {
-    // Traite les données pour les mettre sous le format json 
+    // Processes the data and changes it into a json object
     let start_energy = Math.trunc(
       (countSliderValue[0] - dataLean[0][2]) / dataLean[0][3]
     );
@@ -149,7 +161,6 @@ const Count = (props) => {
     setCountData(data);
   };
 
-
   var series = [
     {
       name: "Nombre de photons par heure",
@@ -158,7 +169,8 @@ const Count = (props) => {
   ];
 
   const options = {
-    // Définit les options du graphique
+    // Defining the graph options
+    // autoselected tool (zoom), toolbar, exported files, value formatter, responsive
     chart: {
       type: "line",
       stacked: false,

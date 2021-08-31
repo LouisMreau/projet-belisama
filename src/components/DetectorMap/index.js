@@ -35,8 +35,8 @@ import DetectList from "../DetectorList/detectorList";
 /**
  * @author
  * @function DetectorMap
- * Lance la carte interactive avec marqueur pour chaque détecteur ainsi que la liste des détecteurs (composant detectorList)
- * Prend en props le fichier json avec toutes les informations relatives aux détecteurs
+ * The home page, it displays the detector map with marker for each detector and it calls detectorList.js for the list on the left
+ * Loads the json object that gives all the information about detectors
  **/
 
 const BootstrapButton = withStyles({
@@ -120,7 +120,7 @@ const DetectorMap = (props) => {
                   [90, 180],
                 ]}
               >
-                {/* Pour un zoom sur l'ile de France 48.80496, 2.23108 zoom 9 */}
+                {/* Zoom on ile de France : 48.80496, 2.23108 zoom 9 */}
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -132,7 +132,7 @@ const DetectorMap = (props) => {
                       <Grid container justify="center" spacing={3}>
                         <Grid item xs={12}>
                           <b>Lieu : </b> {detector.place} <br />
-                          <b>Contact : </b> {detector.contact} <br />
+                          {/* <b>Contact : </b> {detector.contact} <br /> */}
                           <b>Date d'installation : </b>{" "}
                           {detector.installation_date} <br />
                           <b>Statut : </b>{" "}

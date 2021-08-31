@@ -4,15 +4,15 @@ import moment from 'moment'
 /**
 * @author
 * @function CountViewer
-* Lance le graphiques adapté au taux de comptage
-* Prend en props un array avec en premier élément les noms des séries et en deuxième position le titre du graphique 
-* Prend les données dans le format suivant : [{x : value, y : value}, ...]
+* Return the counting graph
+* Takes in props an array whose first element is an array of the series name and whose second element is the graph title and data
+* Format of data : [{x : value, y : value}, ...]
 **/
 
 export default function CountViewer(props) {
   const seriesName = props.name[0];
-  const data = props.data
   const title = props.name[1];
+  const data = props.data
   var series = []
   var filename = 'comptage'
   seriesName.map(function(sname, index) {
@@ -22,8 +22,8 @@ export default function CountViewer(props) {
           data : data[index]
       });
   })
-  // Définition des options du graphique : 
-  // outil par défaut (zoom), barre d'outils, fichiers d'exportation, formatter des valeurs, responsive
+  // Defining the graph options 
+  // autoselected tool (zoom), toolbar, exported files, value formatter, responsive
   const options = {
     chart: {
       autoSelected : 'zoom',

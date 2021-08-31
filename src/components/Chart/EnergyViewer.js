@@ -6,9 +6,9 @@ import { Slider, Typography, Box, TextField, Grid } from "@material-ui/core";
 /**
  * @author
  * @function EnergyViewer
- * Lance le graphiques adapté au spectre d'énergie
- * Prend en props un array avec en premier élément les noms des séries et en deuxième position le titre du graphique
- * Prend les données dans le format suivant : [{x : value, y : value}, ...]
+ * Return the energy graph
+ * Takes in props an array whose first element is an array of the series name and whose second element is the graph title and data
+ * Format of data : [{x : value, y : value}, ...]
  **/
 
 export default function EnergyViewer(props) {
@@ -26,8 +26,8 @@ export default function EnergyViewer(props) {
     });
   });
 
-  // Définition des options du graphique :
-  // outil par défaut (zoom), barre d'outils, fichiers d'exportation, formatter des valeurs, responsive
+  // Defining the graph options 
+  // autoselected tool (zoom), toolbar, exported files, value formatter, responsive
   const options = {
     chart: {
       type: "area",

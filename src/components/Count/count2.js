@@ -36,10 +36,10 @@ import CountViewer from "../Chart/CountViewer";
 /**
  * @author
  * @function Count2
- * Permet à l'utilisateur de sélectionner deux détecteurs pour l'étude du taux de comptage
- * Construit le nuage de points pour le taux de comptage et appelle CountViewer pour afficher le graphique
- * En props : Deux id de détecteurs et leurs données traitées et le fichier qui donne les informations sur les détecteurs (nom, place...)
- * Se référer à count.js pour plus d'informations sur les fonctions 
+ * Displays the counting graph for two detectors
+ * Builds the data and calls CountViewer to draw the graph
+ * Props : Two detector id, their data and information concerning all detectors (name, place, ...)
+ * Please refer to count.js for more information
 **/
 
 const Count2 = (props) => {
@@ -52,7 +52,7 @@ const Count2 = (props) => {
   const dataDetector = props.dataDetector;
 
   const maximumOfTwoDates = (date1, date2) => {
-    // Determine la date la plus tardive pour le début du calendrier
+    // Determine the latest date between two dates
     return date1 > date2 ? date1 : date2;
   };
 
@@ -67,30 +67,31 @@ const Count2 = (props) => {
     installation_date2 = installation_date2 + "T00:00:00";
     return maximumOfTwoDates(installation_date1, installation_date2);
   };
- // Definition de la date d'installation pour la sélection de dates avec des données disponibles
+  // Defining the installation data to ensure the visualization of the available data
+  // installation_date is a date object
   var installation_date = getFirst(detectorId1, detectorId2);
 
-  // Choix du detecteur arbitraire pour le slider puisque même min et max
+  // Same minimum and maximum of energy for all detectors
   const [countSliderValue, setCountSliderValue] = useState([
     dataLean1[0][2],
     dataLean1[0][2] + 7000,
   ]);
-  // Décalage horaire de 2 heures à prendre en compte pour la date de fin
-      // le timestamp de la fin du dataLean s'appuie sur le nom du fichier qui est une date locale mais est comprise en tant que data UTC lors de la transformation
+  // !!! Must take into account the two hour lag !!!
+  // The second timestamp in the datalean has been understood as a UTC date and not a locale date, thus it has added two hours (GMT +02) in the transformation
   const [countTimeValue, setCountTimeValue] = useState([
     new Date(installation_date),
     new Date(dataLean1[0][1] - 2 * 3600 * 1000),
   ]);
-  // Définition des trois séries de données
+  // Defining the three series (first detector, second, difference)
   const [countData1, setCountData1] = useState([]);
   const [countData2, setCountData2] = useState([]);
   const [dataDiff, setCountDifference] = useState([]);
-  // Le premier element correspond au nom de la ou des séries et le second au titre du graphique
+  // Names for the graph (array of series name, graph title)
   const nameDiff = [
     ["Différence détecteur1 - détecteur2"],
     "Différence détecteur1 - détecteur2",
   ];
-  // Le premier element correspond au nom de la ou des séries et le second au titre du graphique
+  // Names for the graph (array of series name, graph title)
   const name = [[detectorId1, detectorId2], "Taux de comptage"];
 
   useEffect(() => {

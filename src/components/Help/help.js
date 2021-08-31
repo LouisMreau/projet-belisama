@@ -11,7 +11,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 /**
 * @author
 * @function Help
-* Donne les consignes et indications présentes sur les pages d'accueil, de téléchargement etc.
+* Gives advice about the different pages given a page id ("Count", "Energy", "Download"...)
 **/
 
 

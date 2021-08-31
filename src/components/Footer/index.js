@@ -4,7 +4,7 @@ import "./style.css";
 /**
  * @author
  * @function Footer
- * Définit le footer du site Internet
+ * Defines the footer of the website
  **/
 
 const Footer = (props) => {

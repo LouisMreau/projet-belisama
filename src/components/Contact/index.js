@@ -4,7 +4,7 @@ import "./style.css";
 /**
  * @author
  * @function Contact
- * Donne les contacts ayant contribué au projet Belisama
+ * Gives all the contacts of those who have contributed to the project
  **/
 
 const Contact = (props) => {

@@ -19,16 +19,18 @@ import EnergyViewer from "../Chart/EnergyViewer";
 /**
 * @author
 * @function EnergyPeriod
-* Permet à l'utilisateur de sélectionner deux périodes pour l'étude du spectre en énergie
-* Construit le nuage de points pour le  spectre en énergie et appelle EnergyViewer pour afficher les deux graphiques superposés 
-* Se référer à energy.js pour plus d'informations sur les fonctions
+ * Displays the energy graph for two periods
+ * Builds the data and calls EnergyViewer to draw the graphs (one onthe top of the other)
+ * Props : One detector id, its processed data (dataLean) and information concerning all detectors (name, place, ...)
+ * Please refer to energy.js for more information
 **/
 
 const EnergyPeriod = (props) => {
   const detectorId = props.detectorId;
   var dataLean = props.dataLean;
   const dataDetector = props.dataDetector;
-  // Definition de la date d'installation pour la sélection de dates avec des données disponibles
+  // Defining the installation data to ensure the visualization of the available data
+  // installation_date is a date object
   var installation_date = dataDetector.filter(function (detector) {
     return detector.id == detectorId;
   })[0].installation_date;
@@ -44,8 +46,8 @@ const EnergyPeriod = (props) => {
     return newDay;
   };
 
-  // Décalage horaire de 2 heures à prendre en compte pour la date de fin 
-  // le timestamp de la fin du dataLean s'appuie sur le nom du fichier qui est une date locale mais est comprise en tant que data UTC lors de la transformation
+  // !!! Must take into account the two hour lag !!!
+  // The second timestamp in the datalean has been understood as a UTC date and not a locale date, thus it has added two hours (GMT +02) in the transformation
   const [spectrumData1, setSpectrumData1] = useState([]);
   const [spectrumData2, setSpectrumData2] = useState([]);
   const [startDate1, setStartDate1] = useState(new Date(installation_date));

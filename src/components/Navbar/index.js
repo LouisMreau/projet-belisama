@@ -8,8 +8,8 @@ import { Button } from "react-bootstrap";
 /**
  * @author
  * @function NavMain
- * Renvoie la navbar (bootstrap) avec les trois onglets : carte, analyse, à propos
- * Responsive : menu déroulant pour écran portable
+ * Returns the navigation bar with three tabls : counting, energy, downloading
+ * Responsive : menuitem on mobile screen
  **/
 
 const NavMain = (props) => {

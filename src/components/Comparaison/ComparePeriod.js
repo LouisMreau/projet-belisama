@@ -25,8 +25,8 @@ import SpectrumPeriod from "../Energy/spectrumPeriod";
 /**
  * @author
  * @function ComparePeriod
- * Permet le chargement des données pour un détecteur donné en input par l'utilisateur (en vue de visualiser les graphiques de deux périodes données)
- * Appelle CountPeriod qui demande les deux périodes à l'utilisateur
+ * Given one detector and two periods, loads the data concerning them
+ * Calls CountPeriod to display graphs
  **/
 
 const ComparePeriod = (props) => {
