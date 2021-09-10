@@ -69,6 +69,7 @@ const DetectorMap = (props) => {
   const [dataDetector, setDataDetector] = useState([]);
 
   const loadDataDetector = async () => {
+    // Loads the data about all detectors (place, informations...)
     await axios
       .get(
         "https://data-belisama.s3.eu-west-3.amazonaws.com/data_detector.json"

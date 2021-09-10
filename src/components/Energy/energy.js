@@ -434,7 +434,7 @@ const Energy = (props) => {
                     color="primary"
                   />
                 }
-                label="Echelle logarithmique"
+                label="Passage au logarithme"
               />
             </Grid>
           </Grid>

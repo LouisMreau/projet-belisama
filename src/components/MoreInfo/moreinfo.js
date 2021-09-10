@@ -25,7 +25,8 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 
 import logo from "../../resources/icons/sticker.jpeg";
 import detecteur from "../../resources/icons/detecteur1.jpg";
-import video from "../../resources/icons/videos.jpg";
+import cinema from "../../resources/icons/cinema.jpg";
+import code from "../../resources/icons/code.jpg";
 
 /**
  * @author
@@ -34,6 +35,7 @@ import video from "../../resources/icons/videos.jpg";
  **/
 
 const MoreInfo = (props) => {
+
   const useStyles = makeStyles({
     root: {
       minWidth: 125,
@@ -188,7 +190,7 @@ const MoreInfo = (props) => {
                 <TimelineContent>
                   <Card className={classes.root}>
                     <CardMedia align="center">
-                      <img src={video} width="75%" />
+                      <img src={cinema} width="65%" />
                     </CardMedia>
                     <CardContent>
                       <Typography
@@ -243,6 +245,9 @@ const MoreInfo = (props) => {
                 <TimelineContent>
                   <Card className={classes.root}>
                     <CardContent>
+                      <CardMedia align="center">
+                        <img src={code} width="65%" />
+                      </CardMedia>
                       <Typography
                         className={classes.title}
                         variant="h6"
@@ -252,15 +257,19 @@ const MoreInfo = (props) => {
                         Analyse de données
                       </Typography>
                       <Typography variant="body1" component="p" align="left">
-                        {bull} Traitement des données reçues
+                        {bull}{" "}
+                        <a
+                          href="https://data-belisama.s3.eu-west-3.amazonaws.com/processing_code.zip"
+                          target="_blank"
+                        >
+                          Téléchargement des programmes pour le traitement des
+                          données
+                        </a>
                       </Typography>
                       <Typography variant="body1" component="p" align="left">
                         {bull} Préparation d'un site de visualisation de données
                       </Typography>
                       <Box margin="1em"></Box>
-                      <Typography variant="body2" component="p" align="left">
-                        Mise à disposition des fichiers de traitement en cours
-                      </Typography>
                     </CardContent>
                   </Card>
                 </TimelineContent>
@@ -316,7 +325,6 @@ const MoreInfo = (props) => {
                 </Button>
               </CardActions>
             </Card>
-
             <Box margin="1em">
               <Typography
                 variant="overline"
@@ -368,7 +376,6 @@ const MoreInfo = (props) => {
                 </Typography>
               </CardContent>
             </Card>
-
             <Box margin="1em">
               <Typography
                 variant="overline"
@@ -380,7 +387,7 @@ const MoreInfo = (props) => {
             </Box>
             <Card className={classes.root}>
               <CardMedia align="center">
-                <img src={video} width="75%" />
+                <img src={cinema} width="65%" />
               </CardMedia>
               <CardContent>
                 <Typography
@@ -421,7 +428,6 @@ const MoreInfo = (props) => {
                 </Button>
               </CardActions>
             </Card>
-
             <Box margin="1em">
               <Typography
                 variant="overline"
@@ -433,6 +439,9 @@ const MoreInfo = (props) => {
             </Box>
             <Card className={classes.root}>
               <CardContent>
+                <CardMedia align="center">
+                  <img src={code} width="65%" />
+                </CardMedia>
                 <Typography
                   className={classes.title}
                   variant="h6"
@@ -442,15 +451,18 @@ const MoreInfo = (props) => {
                   Analyse de données
                 </Typography>
                 <Typography variant="body1" component="p" align="left">
-                  {bull} Traitement des données reçues
+                  {bull}{" "}
+                  <a
+                    href="https://data-belisama.s3.eu-west-3.amazonaws.com/processing_code.zip"
+                    target="_blank"
+                  >
+                    Téléchargement des programmes pour le traitement des données
+                  </a>
                 </Typography>
                 <Typography variant="body1" component="p" align="left">
                   {bull} Préparation d'un site de visualisation de données
                 </Typography>
                 <Box margin="1em"></Box>
-                <Typography variant="body2" component="p" align="left">
-                  Mise à disposition des fichiers de traitement en cours
-                </Typography>
               </CardContent>
             </Card>
           </Grid>

@@ -1,9 +1,7 @@
 import "./App.css";
 import NavbBar from "./components/Navbar/index";
 import Footer from "./components/Footer/index";
-import Home from "./components/Home/index";
 import DataVisu from "./components/DataVisu/index";
-import Contact from "./components/Contact/index";
 import DetectorMap from "./components/DetectorMap/index";
 import Comparaison from "./components/Comparaison/index";
 import MoreInfo from "./components/MoreInfo/moreinfo";
@@ -27,9 +25,6 @@ function App() {
         <NavbBar />
 
         <Switch>
-          <Route path="/contact">
-            <Contact />
-          </Route>
           <Route path="/about">
             <MoreInfo />
           </Route>

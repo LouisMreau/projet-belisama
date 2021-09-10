@@ -19,14 +19,16 @@ import Tab from "@material-ui/core/Tab";
 import PropTypes from "prop-types";
 import RoomIcon from "@material-ui/icons/Room";
 import DateRangeIcon from "@material-ui/icons/DateRange";
+import BeachAccessIcon from '@material-ui/icons/BeachAccess';
 
 import CompareDetector from "../Comparaison/CompareDetector";
 import ComparePeriod from "../Comparaison/ComparePeriod";
+import CompareOthers from "../Comparaison/CompareOthers"
 
 /**
  * @author
  * @function Comparaison
- * Loads the data concerning all the detectors and displays the appbar that enables to switch from one comparison type to another
+ * Loads the data concerning all the detectors and displays the appbar that enables to switch from one comparison type to another (comparePeriod, compareDetector, compareOthers)
  **/
 
 const Comparaison = (props) => {
@@ -106,6 +108,7 @@ const Comparaison = (props) => {
               icon={<DateRangeIcon />}
               {...a11yProps(1)}
             />
+            <Tab label="Météo" icon={<BeachAccessIcon />} {...a11yProps(2)} />
           </Tabs>
         </Paper>
       </AppBar>
@@ -114,6 +117,9 @@ const Comparaison = (props) => {
       </TabPanel>
       <TabPanel value={value} index={1}>
         <ComparePeriod dataDetector={dataDetector} />
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+        <CompareOthers dataDetector={dataDetector} />
       </TabPanel>
     </div>
   );

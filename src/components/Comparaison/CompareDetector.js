@@ -25,7 +25,9 @@ import Energy2 from "../Energy/energy2";
 /**
  * @author
  * @function CompareDetector
- * GIven two detectors (chosen by the user), loads the data of these two detectors 
+ * Given two detectors (chosen by the user), loads the data of these two detectors 
+ * dataDetector is a json object that gives information about each detector (name, id, place,...)
+ * Returns a page in which the user can select two detectors and a graph type plus a button that triggers the display of the graph (count2)
  **/
 
 const CompareDetector = (props) => {
@@ -59,6 +61,8 @@ const CompareDetector = (props) => {
   }, [loadingData]);
 
   const loadData = async (detectorId1, detectorId2) => {
+    // Loads the processed data of two detectors
+    // The argument "detectorId" is the id of the detector 
     let one =
       "https://data-belisama.s3.eu-west-3.amazonaws.com/" +
       detectorId1 +

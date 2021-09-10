@@ -13,6 +13,7 @@ import {
   Box,
   Typography,
   Card,
+  Hidden,
 } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Tabs from "@material-ui/core/Tabs";
@@ -23,23 +24,27 @@ import GetAppIcon from "@material-ui/icons/GetApp";
 import ShowChartIcon from "@material-ui/icons/ShowChart";
 import GraphicEqIcon from "@material-ui/icons/GraphicEq";
 import WarningIcon from "@material-ui/icons/Warning";
+import AcUnitIcon from "@material-ui/icons/AcUnit";
 
 import Download from "../Download/index";
 import Count from "../Count/count";
 import Energy from "../Energy/energy";
+import HKGraph from "../HK/hkGraph";
 import OpenWeatherWidget from "../Weather/openWeatherWidget";
 
 /**
  * @author
  * @function DataVisu
- * Displays the AppBar to switch between three sections : counting graph, energy graph, downloading
- * Loads the data for one particular detector selected on the home page (map) and loads the information concerning all detectors
+ * Displays the tabs to switch between three sections : counting graph, energy graph, downloading, etc
+ * Loads the data for one particular detector selected on the home page (map), loads the information concerning all detectors and the hk data which is the data concerning temperature, pressure and humidity
  **/
 
 const DataVisu = (props) => {
   let { detectorId } = useParams();
   const [dataLean, setDataLean] = useState([]);
   const [dataDetector, setDataDetector] = useState([]);
+  const [HKData, setHKData] = useState([]);
+  const [noData, setNoData] = useState(false)
   const [isLoadinData, setIsLoadingData] = useState(true);
   const [loadingMessage, setloadingMessage] = useState(
     "Chargement des données du détecteur..."
@@ -48,10 +53,11 @@ const DataVisu = (props) => {
   const [breakdown, setBreakdown] = useState(false);
 
   useEffect(() => {
-    if (dataLean.length > 0 && dataDetector.length > 0) {
+    if (dataLean.length > 0 && dataDetector.length > 0 && (HKData.length > 0 || noData)) {
       setIsLoadingData(false);
+      console.log(HKData)
     }
-  }, [dataLean, dataDetector]);
+  }, [dataLean, dataDetector, HKData, noData]);
 
   useEffect(() => {
     loadData();
@@ -59,6 +65,10 @@ const DataVisu = (props) => {
 
   useEffect(() => {
     loadDataDetector();
+  }, []);
+
+  useEffect(() => {
+    loadHKData();
   }, []);
 
   useEffect(() => {
@@ -83,7 +93,26 @@ const DataVisu = (props) => {
       });
   };
 
+  const loadHKData = async () => {
+
+    const url =
+      "https://data-belisama.s3.eu-west-3.amazonaws.com/"+ detectorId +"/hk_files/"+ detectorId +"_hk_THP.json";
+    await axios
+      .get(url)
+      .then((response) => {
+        setHKData(response.data);
+        if (response.data.length == 0) {
+          setNoData(true)
+        }
+      })
+      .catch((error) => {
+        console.log("Données introuvables");
+        setHKData([])
+      });
+  };
+
   const loadData = async () => {
+    // Loads the processed data of one detector 
     await axios
       .get(
         "https://data-belisama.s3.eu-west-3.amazonaws.com/" +
@@ -102,6 +131,39 @@ const DataVisu = (props) => {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  function TabPanelMin(props) {
+    const { children, value, index, ...other } = props;
+
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`scrollable-force-tabpanel-${index}`}
+        aria-labelledby={`scrollable-force-tab-${index}`}
+        {...other}
+      >
+        {value === index && (
+          <Box p={3}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+
+  TabPanelMin.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired,
+  };
+
+  function a11yPropsMin(index) {
+    return {
+      id: `scrollable-force-tab-${index}`,
+      "aria-controls": `scrollable-force-tabpanel-${index}`,
+    };
+  }
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -143,66 +205,175 @@ const DataVisu = (props) => {
       {isLoadinData && <h2 style={{ margin: "30px" }}>{loadingMessage}</h2>}
       {!isLoadinData && (
         <Grid>
-          <AppBar position="static">
-            <Paper square>
-              <Tabs
-                value={value}
-                onChange={handleChange}
-                indicatorColor="primary"
-                variant="fullWidth"
-                aria-label="full width tabs example"
-                textColor="primary"
-                centered
-              >
-                <Tab
-                  label="Taux de comptage"
-                  icon={<ShowChartIcon />}
-                  {...a11yProps(0)}
+          <Hidden smUp>
+            <Grid>
+              <AppBar position="static" color="default">
+                <Paper square>
+                  <Grid container justify="center">
+                    <Tabs
+                      value={value}
+                      onChange={handleChange}
+                      variant="scrollable"
+                      scrollButtons="on"
+                      indicatorColor="primary"
+                      textColor="primary"
+                      aria-label="scrollable force tabs example"
+                      centered
+                    >
+                      <Tab
+                        label="Taux de comptage"
+                        icon={<ShowChartIcon />}
+                        {...a11yPropsMin(0)}
+                      />
+                      <Tab
+                        label="Spectre en énergie"
+                        icon={<GraphicEqIcon />}
+                        {...a11yPropsMin(1)}
+                      />
+                      
+                      <Tab
+                        label="Téléchargement"
+                        icon={<GetAppIcon />}
+                        className="word"
+                        {...a11yPropsMin(2)}
+                      />
+                      {!noData && (
+                      <Tab
+                        label="Température, pression et humidité"
+                        icon={<AcUnitIcon />}
+                        {...a11yPropsMin(3)}
+                      />
+                      )}
+                    </Tabs>
+                  </Grid>
+                </Paper>
+              </AppBar>
+              {breakdown && (
+                <Grid item xs={12}>
+                  <Card>
+                    {" "}
+                    <WarningIcon /> Attention, ce détecteur est désactivé ou
+                    n'envoie plus de données depuis plus de 24 heures.{" "}
+                  </Card>
+                </Grid>
+              )}
+              <TabPanelMin value={value} index={0}>
+                <Count
+                  dataLean={dataLean}
+                  detectorId={detectorId}
+                  dataDetector={dataDetector}
                 />
-                <Tab
-                  label="Spectre en énergie"
-                  icon={<GraphicEqIcon />}
-                  {...a11yProps(1)}
+              </TabPanelMin>
+              <TabPanelMin value={value} index={1}>
+                <Energy
+                  dataLean={dataLean}
+                  detectorId={detectorId}
+                  dataDetector={dataDetector}
                 />
-                <Tab
-                  label="Téléchargement"
-                  icon={<GetAppIcon />}
-                  className="word"
-                  {...a11yProps(2)}
+              </TabPanelMin>
+              {!noData && (
+              <TabPanelMin value={value} index={3}>
+                <HKGraph
+                  dataLean={dataLean}
+                  detectorId={detectorId}
+                  dataDetector={dataDetector}
+                  HKData = {HKData}
                 />
-              </Tabs>
-            </Paper>
-          </AppBar>
-          {breakdown && (
-            <Grid item xs={12}>
-              <Card>
-                {" "}
-                <WarningIcon /> Attention, ce détecteur est désactivé ou
-                n'envoie plus de données depuis plus de 24 heures.{" "}
-              </Card>
+              </TabPanelMin>
+              )}
+              <TabPanelMin value={value} index={2}>
+                <Download
+                  dataLean={dataLean}
+                  detectorId={detectorId}
+                  dataDetector={dataDetector}
+                />
+              </TabPanelMin>
             </Grid>
-          )}
-          <TabPanel value={value} index={0}>
-            <Count
-              dataLean={dataLean}
-              detectorId={detectorId}
-              dataDetector={dataDetector}
-            />
-          </TabPanel>
-          <TabPanel value={value} index={1}>
-            <Energy
-              dataLean={dataLean}
-              detectorId={detectorId}
-              dataDetector={dataDetector}
-            />
-          </TabPanel>
-          <TabPanel value={value} index={2}>
-            <Download
-              dataLean={dataLean}
-              detectorId={detectorId}
-              dataDetector={dataDetector}
-            />
-          </TabPanel>
+          </Hidden>
+          <Hidden only = "xs">
+            <Grid>
+              <AppBar position="static">
+                <Paper square>
+                  <Tabs
+                    value={value}
+                    onChange={handleChange}
+                    indicatorColor="primary"
+                    variant="fullWidth"
+                    aria-label="full width tabs example"
+                    textColor="primary"
+                    centered
+                  >
+                    <Tab
+                      label="Taux de comptage"
+                      icon={<ShowChartIcon />}
+                      {...a11yProps(0)}
+                    />
+                    <Tab
+                      label="Spectre en énergie"
+                      icon={<GraphicEqIcon />}
+                      {...a11yProps(1)}
+                    />
+                    <Tab
+                      label="Téléchargement"
+                      icon={<GetAppIcon />}
+                      className="word"
+                      {...a11yProps(2)}
+                    />
+                    {!noData && (
+                    <Tab
+                      label="Température, pression et humidité"
+                      icon={<AcUnitIcon />}
+                      {...a11yProps(3)}
+                    />
+                    )}
+                    
+                  </Tabs>
+                </Paper>
+              </AppBar>
+              {breakdown && (
+                <Grid item xs={12}>
+                  <Card>
+                    {" "}
+                    <WarningIcon /> Attention, ce détecteur est désactivé ou
+                    n'envoie plus de données depuis plus de 24 heures.{" "}
+                  </Card>
+                </Grid>
+              )}
+              <TabPanel value={value} index={0}>
+                <Count
+                  dataLean={dataLean}
+                  detectorId={detectorId}
+                  dataDetector={dataDetector}
+                />
+              </TabPanel>
+              <TabPanel value={value} index={1}>
+                <Energy
+                  dataLean={dataLean}
+                  detectorId={detectorId}
+                  dataDetector={dataDetector}
+                />
+              </TabPanel>
+              
+              <TabPanel value={value} index={3}>
+              {!noData && (
+                <HKGraph
+                  dataLean={dataLean}
+                  detectorId={detectorId}
+                  dataDetector={dataDetector}
+                  HKData = {HKData}
+                />
+                )}
+              </TabPanel>
+              
+              <TabPanel value={value} index={2}>
+                <Download
+                  dataLean={dataLean}
+                  detectorId={detectorId}
+                  dataDetector={dataDetector}
+                />
+              </TabPanel>
+            </Grid>
+          </Hidden>
         </Grid>
       )}
     </Grid>

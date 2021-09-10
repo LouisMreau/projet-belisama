@@ -19,22 +19,23 @@ import {
 } from "@material-ui/core";
 import axios from "axios";
 
-import CountPeriod from "../Count/countPeriod";
-import SpectrumPeriod from "../Energy/spectrumPeriod";
+import CountWeather from "../Count/countWeather";
 
 /**
  * @author
- * @function ComparePeriod
- * Given one detector and two periods, loads the data concerning them
+ * @function CompareOthers
+ * Given one weather parameter (temperature, pressure, humidity) and one period, loads the data
  * dataDetector is a json object that gives information about each detector (name, id, place,...)
- * Returns a page in which the user can select two periods and a graph type plus a button that triggers the display of the graph (countPeriod)
+ * Returns a page in which the user can select one period and a weather parameter plus a button that triggers the display of the graph (countWeather)
  **/
 
-const ComparePeriod = (props) => {
+const CompareOthers = (props) => {
   const [dataLean, setDataLean] = useState([]);
   const dataDetector = props.dataDetector;
   const [detectorId, setDetectorId] = useState("");
   const [showGraph, setShowGraph] = useState(false);
+  const [HKData, setHKData] = useState([]);
+
   const [loadingData, setLoadingData] = useState(false);
   const [type, setType] = useState("");
 
@@ -44,15 +45,22 @@ const ComparePeriod = (props) => {
   }, [detectorId, type]);
 
   useEffect(() => {
-    if (dataLean.length > 0 && dataDetector.length > 0) {
+    if (dataLean.length > 0 && HKData.length > 0) {
+      setLoadingData(false)
       setShowGraph(true);
-      setLoadingData(false);
     }
-  }, [dataLean]);
+  }, [dataLean, HKData]);
 
   useEffect(() => {
-    if (detectorId.length > 0) {
+    if (detectorId.length > 0 && loadingData) {
+      loadHKData();
+    }
+  }, [loadingData]);
+
+  useEffect(() => {
+    if (detectorId.length > 0 && loadingData) {
       loadData();
+      ;
     }
   }, [loadingData]);
 
@@ -67,9 +75,31 @@ const ComparePeriod = (props) => {
     if (detectorId.length > 0 && type.length > 0) {
       setLoadingData(true);
     } else {
-      alert("Veuillez choisir un détecteur et un type de graphique.");
+      alert("Veuillez choisir un détecteur et un paramètre.");
       setShowGraph(false);
     }
+  };
+
+  const loadHKData = async () => {
+    // Loads the file that concentrates the information about the temperature, pressure and humidity
+    const url =
+      "https://data-belisama.s3.eu-west-3.amazonaws.com/" +
+      detectorId +
+      "/hk_files/" +
+      detectorId +
+      "_hk_THP.json";
+    await axios
+      .get(url)
+      .then((response) => {
+        setHKData(response.data);
+        if (response.data.length == 0) {
+          alert("Données non disponibles");
+        }
+      })
+      .catch((error) => {
+        console.log("Données introuvables");
+        setHKData([]);
+      });
   };
 
   const loadData = async () => {
@@ -86,7 +116,19 @@ const ComparePeriod = (props) => {
       })
       .catch((error) => {
         console.log("Détecteur introuvable");
+        console.log(error);
       });
+  };
+
+  const createChartData = (xx, yy) => {
+    // Transforms two arrays into a json format object for data visualization
+    // xx : the array containing all the x values
+    // yy : the array containing all the y values
+    let chartData = [];
+    for (var i = 0; i < yy.length; i++) {
+      chartData.push({ x: xx[i], y: yy[i] });
+    }
+    return chartData;
   };
 
   const useStyles = makeStyles((theme) => ({
@@ -104,12 +146,12 @@ const ComparePeriod = (props) => {
         <Grid item xs={12}>
           <Breadcrumbs aria-label="breadcrumb">
             <Typography color="inherit">Analyse</Typography>
-            <Typography color="textPrimary">Par période</Typography>
+            <Typography color="textPrimary">Météo</Typography>
           </Breadcrumbs>
         </Grid>
         <Grid item xs={12}>
           <Box margin="2em"></Box>
-          <h3> Comparaison de deux périodes</h3>
+          <h3> Comparaison avec le temps météorologique</h3>
           <Box margin="2em"></Box>
         </Grid>
         <Grid item md={9} xs={12}>
@@ -143,7 +185,7 @@ const ComparePeriod = (props) => {
                 <Grid item sm={6} xs={12}>
                   <FormControl className={classes.formControl}>
                     <InputLabel id="demo-simple-select-label">
-                      Type de graphique
+                      Paramètres
                     </InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
@@ -151,8 +193,9 @@ const ComparePeriod = (props) => {
                       value={type}
                       onChange={handleChangeType}
                     >
-                      <MenuItem value={"count"}>Taux de comptage</MenuItem>
-                      <MenuItem value={"spectrum"}>Spectre en énergie</MenuItem>
+                      <MenuItem value={"Température"}>Température</MenuItem>
+                      <MenuItem value={"Pression"}>Pression</MenuItem>
+                      <MenuItem value={"Humidité"}>Humidité</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -199,7 +242,7 @@ const ComparePeriod = (props) => {
               <Grid item sm={6} xs={12}>
                 <FormControl className={classes.formControl}>
                   <InputLabel id="demo-simple-select-label">
-                    Type de graphique
+                    Paramètres
                   </InputLabel>
                   <Select
                     labelId="demo-simple-select-label"
@@ -207,8 +250,9 @@ const ComparePeriod = (props) => {
                     value={type}
                     onChange={handleChangeType}
                   >
-                    <MenuItem value={"count"}>Taux de comptage</MenuItem>
-                    <MenuItem value={"spectrum"}>Spectre en énergie</MenuItem>
+                    <MenuItem value={"Température"}>Température</MenuItem>
+                    <MenuItem value={"Pression"}>Pression</MenuItem>
+                    <MenuItem value={"Humidité"}>Humidité</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -228,24 +272,19 @@ const ComparePeriod = (props) => {
             </Grid>
           </Hidden>
         </Grid>
-        {loadingData && detectorId.length > 0 && type.length > 0 && (
+        {loadingData && (
           <Grid item xs={12}>
             <Box margin="2em"></Box>
             <CircularProgress />
           </Grid>
         )}
-        {showGraph && type == "count" && (
-          <CountPeriod
+        {showGraph && (
+          <CountWeather
             detectorId={detectorId}
             dataLean={dataLean}
             dataDetector={dataDetector}
-          />
-        )}
-        {showGraph && type == "spectrum" && (
-          <SpectrumPeriod
-            detectorId={detectorId}
-            dataLean={dataLean}
-            dataDetector={dataDetector}
+            HKData={HKData}
+            type={type}
           />
         )}
       </Grid>
@@ -253,4 +292,4 @@ const ComparePeriod = (props) => {
   );
 };
 
-export default ComparePeriod;
+export default CompareOthers;

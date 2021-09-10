@@ -129,7 +129,7 @@ const Count = (props) => {
   ) => {
     let counts = [];
     let times = [];
-    for (var i = inf_time; i <= sup_time; i++) {
+    for (var i = inf_time; i < sup_time; i++) {
       counts.push(
         dataLean[1][i].slice(inf_energy, sup_energy).reduce((a, b) => a + b, 0)
       );
@@ -313,7 +313,7 @@ const Count = (props) => {
           <OpenWeatherWidget city={city} weatherURL={weatherURL} />
         </Grid>
 
-        <Hidden only="xs">
+        <Hidden only={['xs', 'sm']}>
           <Grid container direction="row-reverse">
             <Grid item xs={12} sm={2}>
               <Help page="Count" />
@@ -336,7 +336,7 @@ const Count = (props) => {
           </Grid>
         </Hidden>
 
-        <Hidden smUp>
+        <Hidden mdUp>
           <Grid container justify="center">
             <Grid>
               <Help page="Count" />

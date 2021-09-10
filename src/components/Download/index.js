@@ -18,8 +18,6 @@ import {
 import JSZip from "jszip";
 import JSZipUtils from "jszip-utils";
 import FileSaver from "file-saver";
-
-import dataDetector from "../../resources/data/data_detector.json";
 import Help from "../Help/help";
 
 /**
@@ -34,6 +32,7 @@ import Help from "../Help/help";
  **/
 
 const Download = (props) => {
+  var dataDetector = props.dataDetector
   // Defining the installation data to ensure the visualization of the available data
   // installation_date is a date object
   var installation_date = dataDetector.filter(function (detector) {
@@ -664,7 +663,7 @@ const Download = (props) => {
                           </p>
                           <DatePicker
                             minDate={new Date(installation_date).setDate(1)}
-                            maxDate={oneMonthAgo(today)}
+                            maxDate={today}
                             selected={downloadRawMonthValue}
                             onChange={(date) => setDownloadRawMonthValue(date)}
                             dateFormat="MM/yyyy"

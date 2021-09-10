@@ -37,7 +37,7 @@ import CountViewer from "../Chart/CountViewer";
  * @author
  * @function Count2
  * Displays the counting graph for two detectors
- * Builds the data and calls CountViewer to draw the graph
+ * Builds the data for a selected period and calls CountViewer to draw the graph
  * Props : Two detector id, their data and information concerning all detectors (name, place, ...)
  * Please refer to count.js for more information
 **/

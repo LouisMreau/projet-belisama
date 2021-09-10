@@ -65,7 +65,6 @@ const EnergyPeriod = (props) => {
 
   const handleChangeSwitch = (event) => {
     setLoadingData(true);
-    console.log(switchState);
     setSwitchState(event.target.checked);
   };
 
@@ -289,7 +288,7 @@ const EnergyPeriod = (props) => {
                       color="primary"
                     />
                   }
-                  label="Echelle logarithmique"
+                  label="Passage au logarithme"
                 />
               </Grid>
             </Grid>

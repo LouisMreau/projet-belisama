@@ -61,7 +61,7 @@ const BootstrapButton = withStyles({
  * @author
  * @function DetectorList
  * Returns a list of detectors with information concerning them (place, installation date) and let the user select one
- * Takes in props the information about detectors in a json object
+ * Takes in props the information about detectors in a json object (dataDetector)
  **/
 
 export default function DetectorList(props) {
